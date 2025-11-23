@@ -5,6 +5,7 @@ const VARIANTS = {
   success: 'bg-green-600 text-white hover:bg-green-700',
   danger: 'bg-red-600 text-white hover:bg-red-700',
   neutral: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+  white: 'bg-white text-gray-800 border border-gray-200 hover:bg-gray-50',
   gold: 'bg-gold text-primary hover:opacity-90'
 }
 

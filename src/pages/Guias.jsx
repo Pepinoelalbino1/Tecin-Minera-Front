@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { getGuias, createGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts } from '../api/apiClient'
+import { getGuias, createGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia } from '../api/apiClient'
 import Button from '../components/ui/Button'
 import { FaFilePdf, FaPaperPlane, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
+import { showApiError } from '../utils/errorHelpers'
 
 export default function Guias(){
   const [guias, setGuias] = useState([])
@@ -12,13 +13,15 @@ export default function Guias(){
   const [form, setForm] = useState({ fechaEmision: '', puntoPartida: '', puntoLlegada: '', motivoTraslado: '', transportista: '', vehiculo: '' })
   const [detalle, setDetalle] = useState({ guiaId: '', productoId: '', cantidad: '' })
 
+  const addToast = useToast()
+
   const load = async ()=>{
     setLoading(true)
     try{
       const [gData, pData] = await Promise.all([getGuias(), getProducts()])
       setGuias(gData || [])
       setProductos(pData || [])
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
     finally{ setLoading(false) }
   }
 
@@ -37,7 +40,7 @@ export default function Guias(){
       setForm({ fechaEmision: '', puntoPartida: '', puntoLlegada: '', motivoTraslado: '', transportista: '', vehiculo: '' })
       await load()
       addToast('Guía creada', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
   const handleAddDetalle = async (e) =>{
@@ -52,7 +55,7 @@ export default function Guias(){
       setDetalle({ guiaId: '', productoId: '', cantidad: '' })
       await load()
       addToast('Detalle añadido', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
   const handleEmitir = async (id) =>{
@@ -61,16 +64,13 @@ export default function Guias(){
       await load()
       window.open(guiaPdfUrl(id), '_blank')
       addToast('Guía emitida', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); addToast?.(err.message, 'error') }
   }
-
-  const addToast = useToast()
 
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-4">Guías de Remisión</h2>
       {loading && <div>Cargando guías...</div>}
-      {error && <div className="text-red-600">Error: {error}</div>}
 
       <form onSubmit={handleCreate} className="mb-4 p-4 border rounded grid grid-cols-1 md:grid-cols-2 gap-2">
         <input required name="fechaEmision" value={form.fechaEmision} onChange={e=>setForm({...form, fechaEmision:e.target.value})} type="date" className="border p-2 rounded" />
@@ -115,7 +115,23 @@ export default function Guias(){
             </div>
             {g.detalles && g.detalles.length>0 && (
               <ul className="mt-3 space-y-1">
-                {g.detalles.map(d=> <li key={d.id} className="text-sm">{d.productoNombre || d.productoId} — {d.cantidad}</li>)}
+                {g.detalles.map(d=> (
+                  <li key={d.id} className="text-sm flex items-center justify-between">
+                    <div>{d.productoNombre || d.productoId} — {d.cantidad}</div>
+                    {g.estado !== 'EMITIDA' && (
+                      <div>
+                        <Button variant="danger" className="px-2 py-1 text-sm" onClick={async ()=>{
+                          if(!confirm('¿Eliminar este detalle?')) return
+                          try{
+                            await deleteDetalleGuia(g.id, d.id)
+                            await load()
+                            addToast('Detalle eliminado', 'success')
+                          }catch(err){ showApiError(addToast, err); setError(err.message) }
+                        }}>Borrar</Button>
+                      </div>
+                    )}
+                  </li>
+                ))}
               </ul>
             )}
           </div>

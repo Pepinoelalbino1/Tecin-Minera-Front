@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { registrarEntrada, registrarSalida, getKardex, getProducts, getProduct } from '../api/apiClient'
 import Button from '../components/ui/Button'
 import { useToast } from '../components/ToastContext'
+import { showApiError } from '../utils/errorHelpers'
 import { FaArrowDown, FaArrowUp, FaPlus } from 'react-icons/fa'
 
 export default function Movements(){
@@ -16,12 +17,13 @@ export default function Movements(){
   const [selectedKardexProductId, setSelectedKardexProductId] = useState('')
   const [currentStockDisplay, setCurrentStockDisplay] = useState(null)
   const [startingStockDisplay, setStartingStockDisplay] = useState(null)
+  const addToast = useToast()
 
   useEffect(()=>{
     setLoading(true)
     Promise.all([getProducts()])
       .then(([prods]) => { setProductos(prods || []) })
-      .catch(err => setError(err.message))
+      .catch(err => { setError(err.message); showApiError(addToast, err) })
       .finally(()=>setLoading(false))
   },[])
 
@@ -39,7 +41,7 @@ export default function Movements(){
       addToast('Entrada registrada', 'success')
       // refresh kardex if currently viewing this product
       if(selectedKardexProductId) await loadKardex(selectedKardexProductId)
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
   const handleSalida = async (e) =>{
@@ -54,7 +56,7 @@ export default function Movements(){
       setSalida({ productoId: '', cantidad: '', motivo: '' })
       addToast('Salida registrada', 'success')
       if(selectedKardexProductId) await loadKardex(selectedKardexProductId)
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
   const loadKardex = async (productoId) =>{
     if(!productoId) return setKardex([])
@@ -85,17 +87,16 @@ export default function Movements(){
       setKardex(withSaldo)
       setCurrentStockDisplay(currentStock)
       setStartingStockDisplay(startingStock)
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
     finally{ setLoading(false) }
   }
 
-  const addToast = useToast()
+  
 
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-4">Movimientos</h2>
       {loading && <div>Cargando...</div>}
-      {error && <div className="text-red-600">Error: {error}</div>}
 
       <div className="grid grid-cols-1 gap-6">
         <div className="card">

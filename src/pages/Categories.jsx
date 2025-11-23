@@ -3,6 +3,7 @@ import api, { getCategories, createCategory, updateCategory, deleteCategory } fr
 import Button from '../components/ui/Button'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
+import { showApiError } from '../utils/errorHelpers'
 
 export default function Categories(){
   const [categories, setCategories] = useState([])
@@ -14,12 +15,12 @@ export default function Categories(){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [formError, setFormError] = useState(null)
-
+  const addToast = useToast()
   useEffect(()=>{
     setLoading(true)
     getCategories()
       .then(data => setCategories(data))
-      .catch(err => setError(err.message))
+      .catch(err => { setError(err.message); showApiError(addToast, err) })
       .finally(()=>setLoading(false))
   },[])
 
@@ -39,6 +40,7 @@ export default function Categories(){
       addToast('Categoría creada', 'success')
     }catch(err){
       setError(err.message)
+      showApiError(addToast, err)
     }
   }
 
@@ -61,7 +63,7 @@ export default function Categories(){
       setCategories(prev => prev.map(c => c.id === id ? updated : c))
       cancelEdit()
       addToast('Categoría actualizada', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
   const handleUpdate = async (id, nombre, descripcion) =>{
@@ -69,7 +71,7 @@ export default function Categories(){
       const updated = await updateCategory(id, { nombre, descripcion })
       setCategories(prev => prev.map(c => c.id === id ? updated : c))
       addToast('Categoría actualizada', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
   const handleDelete = async (id) =>{
@@ -78,10 +80,8 @@ export default function Categories(){
       await deleteCategory(id)
       setCategories(prev => prev.filter(c => c.id !== id))
       addToast('Categoría eliminada', 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
-
-  const addToast = useToast()
 
   return (
     <section>
@@ -103,7 +103,6 @@ export default function Categories(){
       </form>
       {formError && <div className="text-red-600 mb-2">{formError}</div>}
       {loading && <div>Cargando categorías...</div>}
-      {error && <div className="text-red-600">Error: {error}</div>}
       <ul className="space-y-3">
         {categories.map(c => (
           <li key={c.id} className="card card-padding">

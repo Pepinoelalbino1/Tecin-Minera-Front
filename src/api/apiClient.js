@@ -3,9 +3,19 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 async function handleResponse(res){
   if(!res.ok){
     const text = await res.text().catch(()=>null)
-    throw new Error(text || res.statusText || 'API error')
+    let parsed = null
+    try{ parsed = text ? JSON.parse(text) : null }catch(e){ parsed = null }
+    const message = (parsed && (parsed.message || parsed.error)) ? (parsed.message || parsed.error) : (text || res.statusText || 'API error')
+    const err = new Error(message)
+    err.api = parsed
+    err.status = res.status
+    throw err
   }
-  return res.json().catch(()=>null)
+  try{
+    return await res.json()
+  }catch(e){
+    return null
+  }
 }
 
 async function request(path, options){
@@ -134,6 +144,10 @@ export async function addDetalleGuia(id, payload){
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
+}
+
+export async function deleteDetalleGuia(guiaId, detalleId){
+  return request(`/api/guias/${guiaId}/detalle/${detalleId}`, { method: 'DELETE' })
 }
 
 export async function emitirGuia(id){

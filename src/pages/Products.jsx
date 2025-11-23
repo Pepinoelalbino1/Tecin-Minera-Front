@@ -9,6 +9,7 @@ import {
 import Button from '../components/ui/Button'
 import { FaEdit, FaPowerOff } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
+import { showApiError } from '../utils/errorHelpers'
 
 export default function Products(){
   const [products, setProducts] = useState([])
@@ -17,6 +18,8 @@ export default function Products(){
   const [error, setError] = useState(null)
   const [form, setForm] = useState({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: '', categoriaId: '' })
   const [editingId, setEditingId] = useState(null)
+  const addToast = useToast()
+  
 
   const load = async ()=>{
     setLoading(true)
@@ -26,6 +29,7 @@ export default function Products(){
       setCategories(catData || [])
     }catch(err){
       setError(err.message)
+      showApiError(addToast, err)
     }finally{setLoading(false)}
   }
 
@@ -59,6 +63,7 @@ export default function Products(){
       await load()
     }catch(err){
       setError(err.message)
+      showApiError(addToast, err)
     }
   }
 
@@ -74,13 +79,10 @@ export default function Products(){
       await updateProductEstado(p.id, newEstado)
       await load()
       addToast(`Producto ${newEstado === 'ACTIVO' ? 'activado' : 'inactivado'}`, 'success')
-    }catch(err){ setError(err.message) }
+    }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
-  const addToast = useToast()
-
   if(loading) return <div>Cargando productos...</div>
-  if(error) return <div className="text-red-600">Error: {error}</div>
 
   return (
     <section>
