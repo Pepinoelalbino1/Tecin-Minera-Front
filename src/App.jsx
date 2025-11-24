@@ -5,6 +5,7 @@ import Products from './pages/Products'
 import Categories from './pages/Categories'
 import Movements from './pages/Movements'
 import Guias from './pages/Guias'
+import Reposicion from './pages/Reposicion'
 import { ToastProvider } from './components/ToastContext'
 
 export default function App(){
@@ -19,6 +20,7 @@ export default function App(){
                 <Route path="/" element={<Products />} />
                 <Route path="/productos" element={<Products />} />
                 <Route path="/categorias" element={<Categories />} />
+                <Route path="/reposicion" element={<Reposicion />} />
                 <Route path="/movimientos" element={<Movements />} />
                 <Route path="/guias" element={<Guias />} />
               </Routes>

@@ -88,7 +88,7 @@ export default function Products(){
     <section>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold">Productos</h2>
-        <div className="text-sm text-gray-600">Total: {products.length}</div>
+        <div className="stats-badge">Total: {products.length}</div>
       </div>
 
       <form onSubmit={handleSubmit} className="card card-padding mb-8">
@@ -118,11 +118,6 @@ export default function Products(){
           <div>
             <label className="form-label">Unidad de Medida</label>
             <input name="unidadMedida" value={form.unidadMedida} onChange={handleChange} placeholder="Ej: Unidad, Kg, m" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div className="md:col-span-1"></div>
-          <div className="md:col-span-3">
-            <label className="form-label">Descripción</label>
-            <textarea name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Descripción del producto" rows="2" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
         {formErrors && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formErrors}</div>}

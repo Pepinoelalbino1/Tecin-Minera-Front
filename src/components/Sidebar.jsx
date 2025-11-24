@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { FaBox, FaFolder, FaExchangeAlt, FaFileAlt } from 'react-icons/fa'
+import { FaBox, FaFolder, FaExchangeAlt, FaFileAlt, FaClipboardList } from 'react-icons/fa'
 
 export default function Sidebar(){
   return (
@@ -22,6 +22,9 @@ export default function Sidebar(){
         </NavLink>
         <NavLink to="/guias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
           <FaFileAlt className="w-4 h-4" /> <span>Guías</span>
+        </NavLink>
+        <NavLink to="/reposicion" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaClipboardList className="w-4 h-4" /> <span>Reposición</span>
         </NavLink>
       </nav>
     </aside>

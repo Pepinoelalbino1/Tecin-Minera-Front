@@ -3,7 +3,7 @@ import { registrarEntrada, registrarSalida, getKardex, getProducts, getProduct }
 import Button from '../components/ui/Button'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
-import { FaArrowDown, FaArrowUp, FaPlus } from 'react-icons/fa'
+import { FaArrowDown, FaArrowUp, FaPlus, FaPrint } from 'react-icons/fa'
 
 export default function Movements(){
   const [movimientos, setMovimientos] = useState([])
@@ -89,6 +89,31 @@ export default function Movements(){
       setStartingStockDisplay(startingStock)
     }catch(err){ setError(err.message); showApiError(addToast, err) }
     finally{ setLoading(false) }
+  }
+
+  const handlePrintKardex = () =>{
+    if(!selectedKardexProductId) return addToast('Seleccione un producto primero', 'warning')
+    const table = document.getElementById('kardexTable')
+    if(!table) return addToast('No hay datos para imprimir', 'warning')
+    const product = productos.find(p=>String(p.id) === String(selectedKardexProductId))
+    const title = product?.nombre ? `Kardex - ${product.nombre}` : 'Kardex'
+    const style = `
+      body { font-family: Arial, Helvetica, sans-serif; padding: 20px; color: #111827 }
+      h1 { font-size: 18px; margin-bottom: 8px }
+      table { border-collapse: collapse; width: 100%; }
+      table th, table td { border: 1px solid #e5e7eb; padding: 8px; text-align: left }
+      table thead { background: #f9fafb }
+    `
+    const newWin = window.open('', '_blank')
+    if(!newWin) return addToast('No se pudo abrir la ventana de impresión', 'error')
+    newWin.document.write(`<!doctype html><html><head><title>${title}</title><meta charset="utf-8"><style>${style}</style></head><body>`)
+    newWin.document.write(`<h1>${title}</h1>`)
+    newWin.document.write(`<div>Saldo Inicial: ${startingStockDisplay ?? '-'} &nbsp;&nbsp; Saldo Actual: ${currentStockDisplay ?? '-'}</div><br/>`)
+    newWin.document.write(table.outerHTML)
+    newWin.document.write('</body></html>')
+    newWin.document.close()
+    newWin.focus()
+    setTimeout(()=>{ newWin.print(); }, 250)
   }
 
   
@@ -191,9 +216,12 @@ export default function Movements(){
                     <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Saldo Inicial</div>
                     <div className="text-2xl font-bold text-gray-700">{startingStockDisplay ?? '-'}</div>
                   </div>
+                  <div className="ml-auto">
+                    <Button variant="neutral" leftIcon={<FaPrint />} onClick={handlePrintKardex} className="px-3 py-1.5 text-sm" aria-label="Imprimir kardex" title="Imprimir kardex">Imprimir</Button>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table id="kardexTable" className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 border-y border-gray-200">
                         <th className="py-3 px-4 text-left font-semibold text-gray-700">Fecha</th>
