@@ -95,40 +95,71 @@ export default function Movements(){
 
   return (
     <section>
-      <h2 className="text-2xl font-semibold mb-4">Movimientos</h2>
-      {loading && <div>Cargando...</div>}
+      <div className="section-header">
+        <h1 className="page-title">Movimientos</h1>
+      </div>
+      {loading && (
+        <div className="flex items-center justify-center h-32">
+          <div className="loading-spinner"></div>
+          <span className="ml-3 text-gray-600">Cargando...</span>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 gap-6">
-        <div className="card">
-          <div className="flex items-center justify-between p-4 border-b">
-            <div className="text-lg font-semibold">Registrar Movimiento</div>
+      <div className="grid grid-cols-1 gap-8">
+        <div className="card card-padding">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b">
+            <div className="text-lg font-semibold text-gray-800">Registrar Movimiento</div>
             <div className="flex gap-2">
-              <Button variant={activeTab==='entrada' ? 'success' : 'neutral'} leftIcon={<FaArrowDown />} onClick={()=>setActiveTab('entrada')}>Entrada</Button>
-              <Button variant={activeTab==='salida' ? 'primary' : 'neutral'} leftIcon={<FaArrowUp />} onClick={()=>setActiveTab('salida')}>Salida</Button>
+              <Button variant={activeTab==='entrada' ? 'success' : 'neutral'} leftIcon={<FaArrowDown />} onClick={()=>setActiveTab('entrada')} className="px-4 py-2">Entrada</Button>
+              <Button variant={activeTab==='salida' ? 'primary' : 'neutral'} leftIcon={<FaArrowUp />} onClick={()=>setActiveTab('salida')} className="px-4 py-2">Salida</Button>
             </div>
           </div>
-          <div className="p-4">
+          <div>
             {activeTab === 'entrada' ? (
-              <form onSubmit={handleEntrada} className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <select value={entrada.productoId} onChange={e=>setEntrada(prev=>({...prev, productoId:e.target.value}))} className="border p-2 rounded" required>
-                  <option value="">-- Producto --</option>
-                  {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                </select>
-                <input value={entrada.cantidad} onChange={e=>setEntrada(prev=>({...prev, cantidad:e.target.value}))} placeholder="Cantidad" type="number" className="border p-2 rounded" required />
-                <input value={entrada.motivo} onChange={e=>setEntrada(prev=>({...prev, motivo:e.target.value}))} placeholder="Motivo" className="border p-2 rounded" required />
-                <div className="md:col-span-3 text-right">
+              <form onSubmit={handleEntrada}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="form-label">Producto</label>
+                    <select value={entrada.productoId} onChange={e=>setEntrada(prev=>({...prev, productoId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+                      <option value="">Seleccionar producto</option>
+                      {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Cantidad</label>
+                    <input value={entrada.cantidad} onChange={e=>setEntrada(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Motivo</label>
+                    <input value={entrada.motivo} onChange={e=>setEntrada(prev=>({...prev, motivo:e.target.value}))} placeholder="Compra, Devolución, etc." className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                  </div>
+                </div>
+                {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
+                <div className="mt-4 flex justify-end">
                   <Button variant="success" leftIcon={<FaPlus />}>Registrar Entrada</Button>
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleSalida} className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <select value={salida.productoId} onChange={e=>setSalida(prev=>({...prev, productoId:e.target.value}))} className="border p-2 rounded" required>
-                  <option value="">-- Producto --</option>
-                  {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                </select>
-                <input value={salida.cantidad} onChange={e=>setSalida(prev=>({...prev, cantidad:e.target.value}))} placeholder="Cantidad" type="number" className="border p-2 rounded" required />
-                <input value={salida.motivo} onChange={e=>setSalida(prev=>({...prev, motivo:e.target.value}))} placeholder="Motivo" className="border p-2 rounded" required />
-                <div className="md:col-span-3 text-right">
+              <form onSubmit={handleSalida}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="form-label">Producto</label>
+                    <select value={salida.productoId} onChange={e=>setSalida(prev=>({...prev, productoId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+                      <option value="">Seleccionar producto</option>
+                      {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Cantidad</label>
+                    <input value={salida.cantidad} onChange={e=>setSalida(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Motivo</label>
+                    <input value={salida.motivo} onChange={e=>setSalida(prev=>({...prev, motivo:e.target.value}))} placeholder="Venta, Consumo, etc." className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                  </div>
+                </div>
+                {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
+                <div className="mt-4 flex justify-end">
                   <Button variant="primary" leftIcon={<FaPlus />}>Registrar Salida</Button>
                 </div>
               </form>
@@ -136,50 +167,66 @@ export default function Movements(){
           </div>
         </div>
 
-        <div className="card p-4">
-          <div className="text-lg font-semibold mb-3">Kardex por Producto</div>
-          <div className="p-4">
-            <select className="border p-2 rounded mb-4 w-full" value={selectedKardexProductId} onChange={e => { setSelectedKardexProductId(e.target.value); loadKardex(e.target.value) }}>
-              <option value="">-- Seleccione un producto --</option>
-              {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
+        <div className="card card-padding">
+          <div className="mb-4 pb-3 border-b">
+            <h3 className="text-lg font-semibold text-gray-800">Kardex por Producto</h3>
+          </div>
+          <div>
+            <div className="mb-6">
+              <label className="form-label">Seleccionar Producto</label>
+              <select className="border border-gray-300 p-2.5 rounded-lg w-full md:w-1/2 focus:ring-2 focus:ring-primary/20" value={selectedKardexProductId} onChange={e => { setSelectedKardexProductId(e.target.value); loadKardex(e.target.value) }}>
+                <option value="">Seleccione un producto</option>
+                {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
+              </select>
+            </div>
             {selectedKardexProductId ? (
               <div>
-                <div className="mb-3 flex gap-4 items-center">
-                  <div className="text-sm">Saldo actual: <strong>{currentStockDisplay ?? '-'}</strong></div>
-                  <div className="text-sm">Saldo inicial: <strong>{startingStockDisplay ?? '-'}</strong></div>
+                <div className="mb-5 flex gap-6 items-center p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Saldo Actual</div>
+                    <div className="text-2xl font-bold text-primary">{currentStockDisplay ?? '-'}</div>
+                  </div>
+                  <div className="h-10 w-px bg-gray-300"></div>
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Saldo Inicial</div>
+                    <div className="text-2xl font-bold text-gray-700">{startingStockDisplay ?? '-'}</div>
+                  </div>
                 </div>
-                <div className="overflow-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left">
-                      <th className="pb-2">Fecha</th>
-                      <th className="pb-2">Tipo</th>
-                      <th className="pb-2">Cantidad</th>
-                      <th className="pb-2">Motivo</th>
-                      <th className="pb-2">Saldo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {kardex.length === 0 ? (
-                      <tr><td colSpan={5} className="py-6 text-center text-gray-500">No hay movimientos para este producto.</td></tr>
-                    ) : (
-                      kardex.map((row, idx) => (
-                        <tr key={idx} className="border-t">
-                          <td className="py-2">{row.fecha || row.createdAt || ''}</td>
-                          <td className="py-2">{row.tipo || row.tipoMovimiento || ''}</td>
-                          <td className="py-2">{row.cantidad}</td>
-                          <td className="py-2">{row.motivo || ''}</td>
-                          <td className="py-2">{row.saldo !== undefined ? row.saldo : ''}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-y border-gray-200">
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Fecha</th>
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Tipo</th>
+                        <th className="py-3 px-4 text-right font-semibold text-gray-700">Cantidad</th>
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Motivo</th>
+                        <th className="py-3 px-4 text-right font-semibold text-gray-700">Saldo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {kardex.length === 0 ? (
+                        <tr><td colSpan={5} className="py-12 text-center text-gray-500">No hay movimientos para este producto.</td></tr>
+                      ) : (
+                        kardex.map((row, idx) => (
+                          <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-4">{row.fecha || row.createdAt || '-'}</td>
+                            <td className="py-3 px-4">
+                              <span className={`badge ${(row.tipo || row.tipoMovimiento || '').toUpperCase() === 'ENTRADA' ? 'badge-success' : 'badge-primary'}`}>
+                                {row.tipo || row.tipoMovimiento || '-'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-right font-medium">{row.cantidad || 0}</td>
+                            <td className="py-3 px-4 text-gray-600">{row.motivo || '-'}</td>
+                            <td className="py-3 px-4 text-right font-bold text-primary">{row.saldo !== undefined ? row.saldo : '-'}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-8">Seleccione un producto para ver su kardex</div>
+              <div className="empty-state py-12">Seleccione un producto para ver su kardex</div>
             )}
           </div>
         </div>

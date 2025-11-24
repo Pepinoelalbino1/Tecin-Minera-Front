@@ -85,57 +85,78 @@ export default function Categories(){
 
   return (
     <section>
-      <h2 className="text-2xl font-semibold mb-4">Categorías</h2>
-      <form onSubmit={handleCreate} className="mb-4 card card-padding">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+      <div className="section-header">
+        <h1 className="page-title">Categorías</h1>
+        <div className="stats-badge">Total: {categories.length}</div>
+      </div>
+
+      <form onSubmit={handleCreate} className="card card-padding mb-8">
+        <div className="mb-4 pb-3 border-b">
+          <h3 className="text-lg font-semibold text-gray-800">Nueva Categoría</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="small muted">Nombre</label>
-            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Nombre" className="border p-2 rounded w-full" />
+            <label className="form-label">Nombre</label>
+            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Ej: Materiales" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
           </div>
           <div>
-            <label className="small muted">Descripción</label>
-            <input value={descripcion} onChange={e=>setDescripcion(e.target.value)} placeholder="Descripción" className="border p-2 rounded w-full" />
-          </div>
-          <div className="text-right">
-            <Button variant="primary" className="w-full">Crear</Button>
+            <label className="form-label">Descripción</label>
+            <input value={descripcion} onChange={e=>setDescripcion(e.target.value)} placeholder="Descripción breve" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
           </div>
         </div>
+        {formError && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formError}</div>}
+        <div className="mt-5 pt-4 border-t flex justify-end">
+          <Button variant="primary">Crear Categoría</Button>
+        </div>
       </form>
-      {formError && <div className="text-red-600 mb-2">{formError}</div>}
-      {loading && <div>Cargando categorías...</div>}
-      <ul className="space-y-3">
-        {categories.map(c => (
-          <li key={c.id} className="card card-padding">
-            {editingId === c.id ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+      {loading && (
+        <div className="flex items-center justify-center h-32">
+          <div className="loading-spinner"></div>
+          <span className="ml-3 text-gray-600">Cargando categorías...</span>
+        </div>
+      )}
+      {categories.length === 0 && !loading ? (
+        <div className="empty-state card card-padding">No hay categorías disponibles</div>
+      ) : (
+        <ul className="space-y-4">
+          {categories.map(c => (
+            <li key={c.id} className="card card-padding hover:shadow-lg transition-shadow">
+              {editingId === c.id ? (
                 <div>
-                  <label className="small muted">Nombre</label>
-                  <input value={editName} onChange={e=>setEditName(e.target.value)} className="border p-2 rounded w-full" />
+                  <div className="mb-4 pb-3 border-b">
+                    <h3 className="text-lg font-semibold text-gray-800">Editar Categoría</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="form-label">Nombre</label>
+                      <input value={editName} onChange={e=>setEditName(e.target.value)} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <div>
+                      <label className="form-label">Descripción</label>
+                      <input value={editDescripcion} onChange={e=>setEditDescripcion(e.target.value)} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                  </div>
+                  <div className="mt-5 pt-4 border-t flex gap-3 justify-end">
+                    <Button variant="neutral" onClick={cancelEdit}>Cancelar</Button>
+                    <Button variant="primary" onClick={()=>saveEdit(c.id)}>Guardar Cambios</Button>
+                  </div>
                 </div>
-                <div>
-                  <label className="small muted">Descripción</label>
-                  <input value={editDescripcion} onChange={e=>setEditDescripcion(e.target.value)} className="border p-2 rounded w-full" />
+              ) : (
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="font-semibold text-lg text-gray-900">{c.nombre || c.name}</div>
+                    <div className="text-sm text-gray-600 mt-1">{c.descripcion || 'Sin descripción'}</div>
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <Button variant="neutral" leftIcon={<FaEdit />} onClick={()=>startEdit(c)} className="px-3 py-1.5 text-sm">Editar</Button>
+                    <Button variant="danger" leftIcon={<FaTrash />} onClick={()=>handleDelete(c.id)} className="px-3 py-1.5 text-sm">Eliminar</Button>
+                  </div>
                 </div>
-                <div className="flex gap-2 justify-end">
-                  <Button variant="neutral" onClick={cancelEdit}>Cancelar</Button>
-                  <Button variant="primary" onClick={()=>saveEdit(c.id)}>Guardar</Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold">{c.nombre || c.name}</div>
-                  <div className="text-sm text-gray-600">{c.descripcion}</div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="neutral" leftIcon={<FaEdit />} onClick={()=>startEdit(c)}>Editar</Button>
-                  <Button variant="danger" leftIcon={<FaTrash />} onClick={()=>handleDelete(c.id)}>Eliminar</Button>
-                </div>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

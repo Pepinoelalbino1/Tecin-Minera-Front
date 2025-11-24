@@ -91,21 +91,45 @@ export default function Products(){
         <div className="text-sm text-gray-600">Total: {products.length}</div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" className="border p-2 rounded col-span-1 md:col-span-1" required />
-        <input name="precio" value={form.precio} onChange={handleChange} placeholder="Precio" type="number" className="border p-2 rounded col-span-1 md:col-span-1" />
-        <select name="categoriaId" value={form.categoriaId} onChange={handleChange} className="border p-2 rounded col-span-1 md:col-span-1">
-          <option value="">-- Categoría --</option>
-          {categories.map(c=> <option key={c.id} value={c.id}>{c.nombre}</option>)}
-        </select>
-        <input name="stock" value={form.stock} onChange={handleChange} placeholder="Stock" type="number" className="border p-2 rounded col-span-1 md:col-span-1" />
-        <input name="unidadMedida" value={form.unidadMedida} onChange={handleChange} placeholder="Unidad medida" className="border p-2 rounded col-span-1 md:col-span-1" />
-        <input name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Descripción" className="border p-2 rounded col-span-1 md:col-span-3" />
-        <div className="md:col-span-3 text-right">
-          {editingId && <Button variant="neutral" type="button" onClick={()=>{ setEditingId(null); setForm({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: '', categoriaId: '' }) }} className="mr-2">Cancelar</Button>}
-          <Button variant="primary">{editingId ? 'Guardar' : 'Crear'}</Button>
+      <form onSubmit={handleSubmit} className="card card-padding mb-8">
+        <div className="mb-4 pb-3 border-b">
+          <h3 className="text-lg font-semibold text-gray-800">{editingId ? 'Editar Producto' : 'Nuevo Producto'}</h3>
         </div>
-        {formErrors && <div className="text-red-600 md:col-span-3">{formErrors}</div>}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="form-label">Nombre del Producto</label>
+            <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Ej: Tuberías" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+          </div>
+          <div>
+            <label className="form-label">Precio</label>
+            <input name="precio" value={form.precio} onChange={handleChange} placeholder="0.00" type="number" step="0.01" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+          </div>
+          <div>
+            <label className="form-label">Categoría</label>
+            <select name="categoriaId" value={form.categoriaId} onChange={handleChange} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20">
+              <option value="">Seleccionar categoría</option>
+              {categories.map(c=> <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="form-label">Stock</label>
+            <input name="stock" value={form.stock} onChange={handleChange} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+          </div>
+          <div>
+            <label className="form-label">Unidad de Medida</label>
+            <input name="unidadMedida" value={form.unidadMedida} onChange={handleChange} placeholder="Ej: Unidad, Kg, m" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+          </div>
+          <div className="md:col-span-1"></div>
+          <div className="md:col-span-3">
+            <label className="form-label">Descripción</label>
+            <textarea name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Descripción del producto" rows="2" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+          </div>
+        </div>
+        {formErrors && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formErrors}</div>}
+        <div className="mt-5 pt-4 border-t flex gap-3 justify-end">
+          {editingId && <Button variant="neutral" type="button" onClick={()=>{ setEditingId(null); setForm({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: '', categoriaId: '' }) }}>Cancelar</Button>}
+          <Button variant="primary">{editingId ? 'Guardar Cambios' : 'Crear Producto'}</Button>
+        </div>
       </form>
 
       {products.length === 0
