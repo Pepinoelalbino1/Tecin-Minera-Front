@@ -12,6 +12,7 @@ export default function Guias(){
   const [error, setError] = useState(null)
   const [form, setForm] = useState({ fechaEmision: '', puntoPartida: '', puntoLlegada: '', motivoTraslado: '', transportista: '', vehiculo: '' })
   const [detalle, setDetalle] = useState({ guiaId: '', productoId: '', cantidad: '' })
+  const [selectedGuiaId, setSelectedGuiaId] = useState('')
 
   const addToast = useToast()
 
@@ -19,10 +20,27 @@ export default function Guias(){
     setLoading(true)
     try{
       const [gData, pData] = await Promise.all([getGuias(), getProducts()])
-      setGuias(gData || [])
+      let newGuias = gData || []
+      if(selectedGuiaId){
+        const idx = newGuias.findIndex(x => String(x.id) === String(selectedGuiaId))
+        if(idx > 0){
+          const sel = newGuias[idx]
+          newGuias = [sel, ...newGuias.filter((_,i)=>i!==idx)]
+        }
+      }
+      setGuias(newGuias)
       setProductos(pData || [])
     }catch(err){ setError(err.message); showApiError(addToast, err) }
     finally{ setLoading(false) }
+  }
+
+  const reorderGuias = (id) => {
+    setGuias(prev => {
+      const idx = prev.findIndex(g => String(g.id) === String(id))
+      if(idx <= 0) return prev
+      const sel = prev[idx]
+      return [sel, ...prev.filter((_,i)=>i!==idx)]
+    })
   }
 
   useEffect(()=>{ load() }, [])
@@ -123,7 +141,7 @@ export default function Guias(){
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="form-label">Seleccionar Guía</label>
-            <select value={detalle.guiaId} onChange={e=>setDetalle(prev=>({...prev, guiaId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+            <select value={detalle.guiaId} onChange={e=>{ const id = e.target.value; setDetalle(prev=>({...prev, guiaId:id})); setSelectedGuiaId(id); if(id) reorderGuias(id); }} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
               <option value="">Seleccionar guía</option>
               {guias.map(g=> <option key={g.id} value={g.id}>{g.numeroGuia || `Guía #${g.id}`}</option>)}
             </select>
