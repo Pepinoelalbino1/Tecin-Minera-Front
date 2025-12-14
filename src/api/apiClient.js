@@ -21,15 +21,12 @@ async function handleResponse(res){
 async function request(path, options){
   const url = `${API_BASE}${path}`
   try{
-    // Helpful debug log in dev
     if(import.meta.env.DEV){
-      // eslint-disable-next-line no-console
       console.debug('[api] request', options?.method || 'GET', url)
     }
     const res = await fetch(url, options)
     return await handleResponse(res)
   }catch(err){
-    // Wrap network errors with the URL so the frontend shows useful info
     throw new Error(`Network error fetching ${url}: ${err.message}`)
   }
 }

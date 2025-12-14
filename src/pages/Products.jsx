@@ -140,7 +140,7 @@ export default function Products(){
                     <div className="text-sm text-gray-500">Categoría: {p.categoriaNombre || p.categoriaId || '-'}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-gold font-semibold">{p.precio ? `$${p.precio}` : ''}</div>
+                    <div className="text-gold font-semibold">{p.precio ? `S/ ${p.precio}` : ''}</div>
                     <div className="text-sm text-gray-600">Stock: {p.stock}</div>
                   </div>
                 </div>

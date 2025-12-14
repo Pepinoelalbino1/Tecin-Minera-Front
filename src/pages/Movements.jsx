@@ -39,7 +39,6 @@ export default function Movements(){
       await registrarEntrada({ productoId: Number(entrada.productoId), cantidad: Number(entrada.cantidad), motivo: entrada.motivo })
       setEntrada({ productoId: '', cantidad: '', motivo: '' })
       addToast('Entrada registrada', 'success')
-      // refresh kardex if currently viewing this product
       if(selectedKardexProductId) await loadKardex(selectedKardexProductId)
     }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
@@ -65,16 +64,12 @@ export default function Movements(){
       const [prod, data] = await Promise.all([getProduct(productoId), getKardex(productoId)])
       const currentStock = prod?.stock ?? 0
       const movements = data || []
-      // movements likely come ordered by fecha desc from backend; compute saldo per row
-      // delta = +cantidad for ENTRADA, -cantidad for SALIDA
       const sumDelta = movements.reduce((s, m) => {
         const tipo = (m.tipo || m.tipoMovimiento || '').toUpperCase()
         const qty = Number(m.cantidad || 0)
         return s + (tipo === 'ENTRADA' ? qty : -qty)
       }, 0)
       const startingStock = Number(currentStock) - Number(sumDelta)
-
-      // process in chronological order (oldest first)
       const asc = movements.slice().reverse()
       let running = startingStock
       const withSaldo = asc.map(m => {
