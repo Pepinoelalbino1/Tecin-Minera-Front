@@ -15,6 +15,12 @@ body{
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background: linear-gradient(180deg, #0f172a 0%, #1a1f35 40%);
+  color: #e2e8f0;
 }
 
 .container {
@@ -184,4 +190,84 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 
 .card:hover::before {
   opacity: 1;
+}
+
+/* Dark Mode Styles */
+.dark {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark aside {
+  background-color: #1a1f35;
+  border-color: #2d3748;
+}
+
+.dark .card {
+  background-color: #1a1f35;
+  border-color: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.dark .card:hover {
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.dark input, .dark textarea, .dark select {
+  background-color: #2d3748;
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: var(--color-primary);
+  ring-color: rgba(11, 87, 164, 0.2);
+}
+
+.dark .page-title {
+  color: #e2e8f0;
+}
+
+.dark .section-header {
+  border-bottom-color: rgba(212, 175, 55, 0.2);
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1;
+}
+
+.dark .text-gray-600 {
+  color: #a0aec0;
+}
+
+.dark .text-gray-500 {
+  color: #718096;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #2d3748;
+}
+
+.dark .badge-primary {
+  background-color: rgba(11, 87, 164, 0.2);
+  color: #93c5fd;
+}
+
+.dark .badge-success {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.dark .badge-inactive {
+  background-color: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+}
+
+.dark .empty-state {
+  color: #718096;
+}
+
+.dark .muted {
+  color: #a0aec0;
 }

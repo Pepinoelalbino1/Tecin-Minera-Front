@@ -35,10 +35,10 @@ export default function App(){
       <ToastProvider>
         {isAuthenticated ? (
           <ThemeProvider>
-            <div className="min-h-screen bg-white text-gray-800 flex transition-colors duration-300">
+            <div className="min-h-screen bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 flex transition-colors duration-300">
               <Sidebar setIsAuthenticated={setIsAuthenticated} />
               <div className="flex-1">
-                <main className="p-6 container">
+                <main className="p-6 container dark:bg-slate-900">
                   <Routes>
                     <Route path="/" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Products /></ProtectedRoute>} />
                     <Route path="/productos" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Products /></ProtectedRoute>} />
