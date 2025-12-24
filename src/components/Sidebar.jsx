@@ -22,15 +22,20 @@ export default function Sidebar({ setIsAuthenticated }){
         <div className="text-sm text-gray-500 mt-3 font-medium">Inventario & Guías</div>
       </div>
       <nav className="space-y-1.5 flex-1">
-        <NavLink to="/productos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100          <FaBox className="w-4 h-4" /> <span>Productos</span>
+        <NavLink to="/productos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaBox className="w-4 h-4" /> <span>Productos</span>
         </NavLink>
-        <NavLink to="/categorias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100          <FaFolder className="w-4 h-4" /> <span>Categorías</span>
+        <NavLink to="/categorias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaFolder className="w-4 h-4" /> <span>Categorías</span>
         </NavLink>
-        <NavLink to="/movimientos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100          <FaExchangeAlt className="w-4 h-4" /> <span>Movimientos</span>
+        <NavLink to="/movimientos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaExchangeAlt className="w-4 h-4" /> <span>Movimientos</span>
         </NavLink>
-        <NavLink to="/guias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100          <FaFileAlt className="w-4 h-4" /> <span>Guías</span>
+        <NavLink to="/guias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaFileAlt className="w-4 h-4" /> <span>Guías</span>
         </NavLink>
-        <NavLink to="/reposicion" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100          <FaClipboardList className="w-4 h-4" /> <span>Reposición</span>
+        <NavLink to="/reposicion" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-gray-100'}`}>
+          <FaClipboardList className="w-4 h-4" /> <span>Reposición</span>
         </NavLink>
       </nav>
 
