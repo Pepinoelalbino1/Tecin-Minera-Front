@@ -67,7 +67,7 @@ export default function Reposicion(){
     setTimeout(()=>{ newWin.print(); }, 250)
   }
 
-  if(loading) return <div>Cargando reposición...</div>
+  if(loading) return <div className="text-gray-700">Cargando reposición...</div>
 
   return (
     <section>
