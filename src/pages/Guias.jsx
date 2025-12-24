@@ -5,13 +5,48 @@ import { FaFilePdf, FaPaperPlane, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
 
+const MOTIVOS_TRASLADO = [
+  { value: 'VENTA', label: 'Venta' },
+  { value: 'COMPRA', label: 'Compra' },
+  { value: 'CONSIGNACION', label: 'Consignación' },
+  { value: 'TRASLADO_ENTRE_ESTABLECIMIENTOS', label: 'Traslado entre establecimientos' },
+  { value: 'DEVOLUCION', label: 'Devolución' },
+  { value: 'IMPORTACION', label: 'Importación' },
+  { value: 'EXPORTACION', label: 'Exportación' },
+  { value: 'OTROS', label: 'Otros' }
+]
+
+const UNIDADES_MEDIDA = ['UND', 'KG', 'CAJA', 'BOLSA', 'BIDON', 'PALLET', 'M3', 'L', 'GR', 'OTROS']
+
 export default function Guias(){
   const [guias, setGuias] = useState([])
   const [productos, setProductos] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [form, setForm] = useState({ fechaEmision: '', puntoPartida: '', puntoLlegada: '', motivoTraslado: '', transportista: '', vehiculo: '' })
-  const [detalle, setDetalle] = useState({ guiaId: '', productoId: '', cantidad: '' })
+  const [form, setForm] = useState({
+    serie: 'GR',
+    fechaEmision: '',
+    fechaInicioTraslado: '',
+    emisorRuc: '',
+    emisorRazonSocial: '',
+    emisorDireccionFiscal: '',
+    destinatarioRucDni: '',
+    destinatarioRazonSocial: '',
+    destinatarioDireccion: '',
+    puntoPartida: '',
+    puntoLlegada: '',
+    motivoTraslado: '',
+    tipoTransporte: 'PRIVADO',
+    placaVehiculo: '',
+    conductorNombre: '',
+    conductorDni: '',
+    transportistaRazonSocial: '',
+    transportistaRuc: '',
+    observaciones: '',
+    referenciaComprobante: '',
+    pesoTotal: ''
+  })
+  const [detalle, setDetalle] = useState({ guiaId: '', productoId: '', cantidad: '', descripcionBien: '', unidadMedida: 'UND' })
   const [selectedGuiaId, setSelectedGuiaId] = useState('')
 
   const addToast = useToast()
@@ -48,14 +83,53 @@ export default function Guias(){
   const handleCreate = async (e) =>{
     e.preventDefault()
     setError(null)
-    // basic validation
-    if(!form.fechaEmision || !form.puntoPartida || !form.puntoLlegada){
-      setError('Fecha, punto de partida y punto de llegada son obligatorios')
+    
+    // Validación básica
+    if(!form.fechaEmision || !form.fechaInicioTraslado || !form.emisorRuc || !form.emisorRazonSocial || 
+       !form.emisorDireccionFiscal || !form.destinatarioRucDni || !form.destinatarioRazonSocial ||
+       !form.destinatarioDireccion || !form.puntoPartida || !form.puntoLlegada || !form.motivoTraslado || !form.tipoTransporte){
+      setError('Todos los campos obligatorios deben ser completados')
       return
     }
+    
+    // Validación campos condicionales según tipo de transporte
+    if(form.tipoTransporte === 'PRIVADO' && (!form.placaVehiculo || !form.conductorNombre || !form.conductorDni)){
+      setError('Para transporte privado, la placa del vehículo, nombre y DNI del conductor son obligatorios')
+      return
+    }
+    
+    if(form.tipoTransporte === 'PUBLICO' && (!form.transportistaRazonSocial || !form.transportistaRuc)){
+      setError('Para transporte público, la razón social y RUC del transportista son obligatorios')
+      return
+    }
+    
     try{
-      await createGuia(form)
-      setForm({ fechaEmision: '', puntoPartida: '', puntoLlegada: '', motivoTraslado: '', transportista: '', vehiculo: '' })
+      const payload = { ...form }
+      if(form.pesoTotal) payload.pesoTotal = parseFloat(form.pesoTotal)
+      await createGuia(payload)
+      setForm({
+        serie: 'GR',
+        fechaEmision: '',
+        fechaInicioTraslado: '',
+        emisorRuc: '',
+        emisorRazonSocial: '',
+        emisorDireccionFiscal: '',
+        destinatarioRucDni: '',
+        destinatarioRazonSocial: '',
+        destinatarioDireccion: '',
+        puntoPartida: '',
+        puntoLlegada: '',
+        motivoTraslado: '',
+        tipoTransporte: 'PRIVADO',
+        placaVehiculo: '',
+        conductorNombre: '',
+        conductorDni: '',
+        transportistaRazonSocial: '',
+        transportistaRuc: '',
+        observaciones: '',
+        referenciaComprobante: '',
+        pesoTotal: ''
+      })
       await load()
       addToast('Guía creada', 'success')
     }catch(err){ setError(err.message); showApiError(addToast, err) }
@@ -64,13 +138,21 @@ export default function Guias(){
   const handleAddDetalle = async (e) =>{
     e.preventDefault()
     setError(null)
-    if(!detalle.guiaId || !detalle.productoId || !detalle.cantidad){
-      setError('Guía, producto y cantidad son obligatorios')
+    if(!detalle.guiaId || !detalle.productoId || !detalle.cantidad || !detalle.unidadMedida){
+      setError('Guía, producto, cantidad y unidad de medida son obligatorios')
       return
     }
     try{
-      await addDetalleGuia(detalle.guiaId, { productoId: Number(detalle.productoId), cantidad: Number(detalle.cantidad) })
-      setDetalle({ guiaId: '', productoId: '', cantidad: '' })
+      const producto = productos.find(p => p.id === Number(detalle.productoId))
+      const descripcion = detalle.descripcionBien || (producto ? producto.nombre : '')
+      
+      await addDetalleGuia(detalle.guiaId, { 
+        productoId: Number(detalle.productoId), 
+        cantidad: Number(detalle.cantidad),
+        descripcionBien: descripcion,
+        unidadMedida: detalle.unidadMedida
+      })
+      setDetalle({ guiaId: '', productoId: '', cantidad: '', descripcionBien: '', unidadMedida: 'UND' })
       await load()
       addToast('Detalle añadido', 'success')
     }catch(err){ setError(err.message); showApiError(addToast, err) }
@@ -83,6 +165,16 @@ export default function Guias(){
       window.open(guiaPdfUrl(id), '_blank')
       addToast('Guía emitida', 'success')
     }catch(err){ setError(err.message); addToast?.(err.message, 'error') }
+  }
+
+  const handleProductoChange = (productoId) => {
+    const producto = productos.find(p => p.id === Number(productoId))
+    setDetalle(prev => ({
+      ...prev,
+      productoId,
+      descripcionBien: producto ? producto.nombre : prev.descripcionBien,
+      unidadMedida: producto?.unidadMedida || 'UND'
+    }))
   }
 
   return (
@@ -102,32 +194,156 @@ export default function Guias(){
         <div className="mb-4 pb-3 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Nueva Guía de Remisión</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="form-label">Fecha de Emisión</label>
-            <input required name="fechaEmision" value={form.fechaEmision} onChange={e=>setForm({...form, fechaEmision:e.target.value})} type="date" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="form-label">Motivo de Traslado</label>
-            <input required name="motivoTraslado" value={form.motivoTraslado} onChange={e=>setForm({...form, motivoTraslado:e.target.value})} placeholder="Venta, Traslado, etc." className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="form-label">Punto de Partida</label>
-            <input required name="puntoPartida" value={form.puntoPartida} onChange={e=>setForm({...form, puntoPartida:e.target.value})} placeholder="Dirección de origen" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="form-label">Punto de Llegada</label>
-            <input required name="puntoLlegada" value={form.puntoLlegada} onChange={e=>setForm({...form, puntoLlegada:e.target.value})} placeholder="Dirección de destino" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="form-label">Transportista</label>
-            <input required name="transportista" value={form.transportista} onChange={e=>setForm({...form, transportista:e.target.value})} placeholder="Nombre del transportista" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="form-label">Vehículo</label>
-            <input required name="vehiculo" value={form.vehiculo} onChange={e=>setForm({...form, vehiculo:e.target.value})} placeholder="Placa o identificación" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+        
+        {/* Serie y Fechas */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Serie y Fechas</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="form-label">Serie <span className="text-red-500">*</span></label>
+              <input required name="serie" value={form.serie} onChange={e=>setForm({...form, serie:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="form-label">Fecha de Emisión <span className="text-red-500">*</span></label>
+              <input required name="fechaEmision" value={form.fechaEmision} onChange={e=>setForm({...form, fechaEmision:e.target.value, fechaInicioTraslado: form.fechaInicioTraslado || e.target.value})} type="date" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="form-label">Fecha Inicio Traslado <span className="text-red-500">*</span></label>
+              <input required name="fechaInicioTraslado" value={form.fechaInicioTraslado} onChange={e=>setForm({...form, fechaInicioTraslado:e.target.value})} type="date" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
           </div>
         </div>
+
+        {/* Datos del Emisor */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Datos del Emisor</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="form-label">RUC <span className="text-red-500">*</span></label>
+              <input required name="emisorRuc" value={form.emisorRuc} onChange={e=>setForm({...form, emisorRuc:e.target.value})} maxLength={11} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="form-label">Razón Social <span className="text-red-500">*</span></label>
+              <input required name="emisorRazonSocial" value={form.emisorRazonSocial} onChange={e=>setForm({...form, emisorRazonSocial:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div className="md:col-span-3">
+              <label className="form-label">Dirección Fiscal <span className="text-red-500">*</span></label>
+              <input required name="emisorDireccionFiscal" value={form.emisorDireccionFiscal} onChange={e=>setForm({...form, emisorDireccionFiscal:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Datos del Destinatario */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Datos del Destinatario</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="form-label">RUC o DNI <span className="text-red-500">*</span></label>
+              <input required name="destinatarioRucDni" value={form.destinatarioRucDni} onChange={e=>setForm({...form, destinatarioRucDni:e.target.value})} maxLength={15} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="form-label">Razón Social <span className="text-red-500">*</span></label>
+              <input required name="destinatarioRazonSocial" value={form.destinatarioRazonSocial} onChange={e=>setForm({...form, destinatarioRazonSocial:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div className="md:col-span-3">
+              <label className="form-label">Dirección <span className="text-red-500">*</span></label>
+              <input required name="destinatarioDireccion" value={form.destinatarioDireccion} onChange={e=>setForm({...form, destinatarioDireccion:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Puntos de Partida y Llegada */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Puntos de Partida y Llegada</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="form-label">Punto de Partida <span className="text-red-500">*</span></label>
+              <input required name="puntoPartida" value={form.puntoPartida} onChange={e=>setForm({...form, puntoPartida:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="form-label">Punto de Llegada <span className="text-red-500">*</span></label>
+              <input required name="puntoLlegada" value={form.puntoLlegada} onChange={e=>setForm({...form, puntoLlegada:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Motivo de Traslado */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Motivo de Traslado</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="form-label">Motivo <span className="text-red-500">*</span></label>
+              <select required name="motivoTraslado" value={form.motivoTraslado} onChange={e=>setForm({...form, motivoTraslado:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20">
+                <option value="">Seleccionar motivo</option>
+                {MOTIVOS_TRASLADO.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Datos del Transporte */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Datos del Transporte</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="form-label">Tipo de Transporte <span className="text-red-500">*</span></label>
+              <select required name="tipoTransporte" value={form.tipoTransporte} onChange={e=>setForm({...form, tipoTransporte:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20">
+                <option value="PRIVADO">Transporte Privado</option>
+                <option value="PUBLICO">Transporte Público</option>
+              </select>
+            </div>
+          </div>
+          
+          {form.tipoTransporte === 'PRIVADO' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="form-label">Placa del Vehículo <span className="text-red-500">*</span></label>
+                <input required name="placaVehiculo" value={form.placaVehiculo} onChange={e=>setForm({...form, placaVehiculo:e.target.value})} maxLength={10} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="form-label">Nombre del Conductor <span className="text-red-500">*</span></label>
+                <input required name="conductorNombre" value={form.conductorNombre} onChange={e=>setForm({...form, conductorNombre:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="form-label">DNI del Conductor <span className="text-red-500">*</span></label>
+                <input required name="conductorDni" value={form.conductorDni} onChange={e=>setForm({...form, conductorDni:e.target.value})} maxLength={8} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+              </div>
+            </div>
+          )}
+          
+          {form.tipoTransporte === 'PUBLICO' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="form-label">Razón Social del Transportista <span className="text-red-500">*</span></label>
+                <input required name="transportistaRazonSocial" value={form.transportistaRazonSocial} onChange={e=>setForm({...form, transportistaRazonSocial:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="form-label">RUC del Transportista <span className="text-red-500">*</span></label>
+                <input required name="transportistaRuc" value={form.transportistaRuc} onChange={e=>setForm({...form, transportistaRuc:e.target.value})} maxLength={11} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Campos Adicionales */}
+        <div className="mb-6">
+          <h4 className="text-md font-semibold text-gray-700 mb-3">Datos Adicionales (Opcionales)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-3">
+              <label className="form-label">Observaciones</label>
+              <textarea name="observaciones" value={form.observaciones} onChange={e=>setForm({...form, observaciones:e.target.value})} rows={3} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="form-label">Referencia a Comprobante</label>
+              <input name="referenciaComprobante" value={form.referenciaComprobante} onChange={e=>setForm({...form, referenciaComprobante:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="form-label">Peso Total (kg)</label>
+              <input type="number" step="0.01" name="pesoTotal" value={form.pesoTotal} onChange={e=>setForm({...form, pesoTotal:e.target.value})} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            </div>
+          </div>
+        </div>
+
         {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
         <div className="mt-5 pt-4 border-t flex justify-end">
           <Button variant="primary" leftIcon={<FaPlus />}>Crear Guía</Button>
@@ -138,25 +354,35 @@ export default function Guias(){
         <div className="mb-4 pb-3 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Añadir Productos a Guía</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="form-label">Seleccionar Guía</label>
             <select value={detalle.guiaId} onChange={e=>{ const id = e.target.value; setDetalle(prev=>({...prev, guiaId:id})); setSelectedGuiaId(id); if(id) reorderGuias(id); }} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
               <option value="">Seleccionar guía</option>
-              {guias.map(g=> <option key={g.id} value={g.id}>{g.numeroGuia || `Guía #${g.id}`}</option>)}
+              {guias.map(g=> <option key={g.id} value={g.id}>{g.serie && g.numeroGuia ? `${g.serie}-${g.numeroGuia}` : g.numeroGuia || `Guía #${g.id}`}</option>)}
             </select>
           </div>
           <div>
             <label className="form-label">Producto</label>
-            <select value={detalle.productoId} onChange={e=>setDetalle(prev=>({...prev, productoId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+            <select value={detalle.productoId} onChange={e=>handleProductoChange(e.target.value)} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
               <option value="">Seleccionar producto</option>
               {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
             </select>
           </div>
           <div>
-            <label className="form-label">Cantidad</label>
-            <input value={detalle.cantidad} onChange={e=>setDetalle(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+            <label className="form-label">Cantidad <span className="text-red-500">*</span></label>
+            <input value={detalle.cantidad} onChange={e=>setDetalle(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" min="1" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
           </div>
+          <div>
+            <label className="form-label">Unidad de Medida <span className="text-red-500">*</span></label>
+            <select value={detalle.unidadMedida} onChange={e=>setDetalle(prev=>({...prev, unidadMedida:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+              {UNIDADES_MEDIDA.map(u => <option key={u} value={u}>{u}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="mt-4">
+          <label className="form-label">Descripción del Bien</label>
+          <textarea value={detalle.descripcionBien} onChange={e=>setDetalle(prev=>({...prev, descripcionBien:e.target.value}))} rows={2} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" placeholder="Descripción detallada del producto" />
         </div>
         <div className="mt-5 pt-4 border-t flex justify-end">
           <Button variant="primary" leftIcon={<FaPlus />}>Añadir Detalle</Button>
@@ -172,24 +398,34 @@ export default function Guias(){
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="font-bold text-lg text-gray-900">{g.numeroGuia || `Guía #${g.id}`}</div>
+                    <div className="font-bold text-lg text-gray-900">
+                      {g.serie && g.numeroGuia ? `${g.serie}-${g.numeroGuia}` : g.numeroGuia || `Guía #${g.id}`}
+                    </div>
                     <span className={`badge ${g.estado === 'EMITIDA' ? 'badge-success' : 'badge-inactive'}`}>
                       {g.estado || 'Borrador'}
                     </span>
                   </div>
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center text-gray-700">
+                      <span className="font-medium mr-2">Emisor:</span>
+                      <span>{g.emisorRazonSocial || '-'} (RUC: {g.emisorRuc || '-'})</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <span className="font-medium mr-2">Destinatario:</span>
+                      <span>{g.destinatarioRazonSocial || '-'} ({g.destinatarioRucDni || '-'})</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
                       <span className="font-medium mr-2">Ruta:</span>
                       <span>{g.puntoPartida || '-'} → {g.puntoLlegada || '-'}</span>
                     </div>
                     <div className="flex items-center text-gray-600">
-                      <span className="font-medium mr-2">Transportista:</span>
-                      <span>{g.transportista || '-'}</span>
+                      <span className="font-medium mr-2">Motivo:</span>
+                      <span>{MOTIVOS_TRASLADO.find(m => m.value === g.motivoTraslado)?.label || g.motivoTraslado || '-'}</span>
                     </div>
-                    {g.vehiculo && (
+                    {g.tipoTransporte && (
                       <div className="flex items-center text-gray-600">
-                        <span className="font-medium mr-2">Vehículo:</span>
-                        <span>{g.vehiculo}</span>
+                        <span className="font-medium mr-2">Transporte:</span>
+                        <span>{g.tipoTransporte === 'PRIVADO' ? `Privado - Placa: ${g.placaVehiculo || '-'}` : `Público - ${g.transportistaRazonSocial || '-'}`}</span>
                       </div>
                     )}
                   </div>
@@ -206,8 +442,8 @@ export default function Guias(){
                     {g.detalles.map(d=> (
                       <li key={d.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <div className="flex items-center gap-3">
-                          <span className="font-medium text-gray-900">{d.productoNombre || d.productoId}</span>
-                          <span className="badge badge-primary">x{d.cantidad}</span>
+                          <span className="font-medium text-gray-900">{d.descripcionBien || d.productoNombre || d.productoId}</span>
+                          <span className="badge badge-primary">{d.cantidad} {d.unidadMedida || 'UND'}</span>
                         </div>
                         {g.estado !== 'EMITIDA' && (
                           <Button variant="danger" className="px-2 py-1 text-xs" onClick={async ()=>{

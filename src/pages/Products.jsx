@@ -11,6 +11,9 @@ import { FaEdit, FaPowerOff } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
 
+// Unidades de medida estandarizadas (mismas que en Guias.jsx)
+const UNIDADES_MEDIDA = ['UND', 'KG', 'CAJA', 'BOLSA', 'BIDON', 'PALLET', 'M3', 'L', 'GR', 'OTROS']
+
 export default function Products(){
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
@@ -58,7 +61,7 @@ export default function Products(){
         await createProduct(payload)
         addToast('Producto creado', 'success')
       }
-      setForm({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: '', categoriaId: '' })
+      setForm({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: 'UND', categoriaId: '' })
       setEditingId(null)
       await load()
     }catch(err){
@@ -116,8 +119,11 @@ export default function Products(){
             <input name="stock" value={form.stock} onChange={handleChange} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
           </div>
           <div>
-            <label className="form-label">Unidad de Medida</label>
-            <input name="unidadMedida" value={form.unidadMedida} onChange={handleChange} placeholder="Ej: Unidad, Kg, m" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            <label className="form-label">Unidad de Medida <span className="text-red-500">*</span></label>
+            <select name="unidadMedida" value={form.unidadMedida} onChange={handleChange} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+              <option value="">Seleccionar unidad</option>
+              {UNIDADES_MEDIDA.map(u => <option key={u} value={u}>{u}</option>)}
+            </select>
           </div>
         </div>
         {formErrors && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formErrors}</div>}
@@ -141,7 +147,7 @@ export default function Products(){
                   </div>
                   <div className="text-right">
                     <div className="text-gold font-semibold">{p.precio ? `S/ ${p.precio}` : ''}</div>
-                    <div className="text-sm text-gray-600">Stock: {p.stock}</div>
+                    <div className="text-sm text-gray-600">Stock: {p.stock} {p.unidadMedida || 'UND'}</div>
                   </div>
                 </div>
                 <div className="mt-4 flex gap-2 justify-end">
