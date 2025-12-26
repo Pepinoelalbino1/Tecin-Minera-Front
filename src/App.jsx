@@ -6,6 +6,7 @@ import Categories from './pages/Categories'
 import Movements from './pages/Movements'
 import Guias from './pages/Guias'
 import Reposicion from './pages/Reposicion'
+import Conversiones from './pages/Conversiones'
 import { ToastProvider } from './components/ToastContext'
 import { ThemeProvider } from './components/ThemeContext'
 import Register from './pages/Register'
@@ -46,6 +47,7 @@ export default function App(){
                     <Route path="/reposicion" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Reposicion /></ProtectedRoute>} />
                     <Route path="/movimientos" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Movements /></ProtectedRoute>} />
                     <Route path="/guias" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Guias /></ProtectedRoute>} />
+                    <Route path="/conversiones" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Conversiones /></ProtectedRoute>} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </main>

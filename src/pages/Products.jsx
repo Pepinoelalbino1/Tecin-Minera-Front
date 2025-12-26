@@ -22,6 +22,12 @@ export default function Products(){
   const [form, setForm] = useState({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: '', categoriaId: '' })
   const [editingId, setEditingId] = useState(null)
   const addToast = useToast()
+  const [errors, setErrors] = useState({})
+  const [touched, setTouched] = useState({})
+  
+  // Get user role from localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const isAdmin = user.role === 'ADMIN'
   
 
   const load = async ()=>{
@@ -38,19 +44,52 @@ export default function Products(){
 
   useEffect(()=>{ load() }, [])
 
-  const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+    if (touched[name]) setErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+  }
 
   const [formErrors, setFormErrors] = useState(null)
+  const handleBlur = (e) => {
+    const { name, value } = e.target
+    setTouched(prev => ({ ...prev, [name]: true }))
+    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+  }
+
+  const validateField = (name, value) => {
+    if (name === 'nombre') {
+      if (!value || value.trim().length < 2) return 'El nombre del producto debe tener al menos 2 caracteres'
+    }
+    if (name === 'precio') {
+      if (value && Number(value) < 0) return 'El precio debe ser positivo'
+    }
+    if (name === 'stock') {
+      if (value && Number(value) < 0) return 'El stock no puede ser negativo'
+    }
+    if (name === 'unidadMedida') {
+      if (!value) return 'Seleccione una unidad de medida'
+    }
+    return ''
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      nombre: validateField('nombre', form.nombre),
+      precio: validateField('precio', form.precio),
+      stock: validateField('stock', form.stock),
+      unidadMedida: validateField('unidadMedida', form.unidadMedida)
+    }
+    setErrors(newErrors)
+    setTouched({ nombre: true, precio: true, stock: true, unidadMedida: true })
+    const hasError = Object.values(newErrors).some(v => v)
+    return !hasError
+  }
 
   const handleSubmit = async (e) =>{
     e.preventDefault()
     setFormErrors(null)
-    // basic validation
-    if(!form.nombre || form.nombre.trim().length < 2){
-      setFormErrors('El nombre del producto debe tener al menos 2 caracteres')
-      return
-    }
-    if(form.precio && Number(form.precio) < 0){ setFormErrors('El precio debe ser positivo'); return }
+    if(!validateForm()) return
     try{
       if(editingId){
         const payload = { ...form, precio: Number(form.precio), stock: Number(form.stock) }
@@ -62,6 +101,8 @@ export default function Products(){
         addToast('Producto creado', 'success')
       }
       setForm({ nombre: '', descripcion: '', precio: '', stock: '', unidadMedida: 'UND', categoriaId: '' })
+      setErrors({})
+      setTouched({})
       setEditingId(null)
       await load()
     }catch(err){
@@ -94,18 +135,20 @@ export default function Products(){
         <div className="stats-badge">Total: {products.length}</div>
       </div>
 
-      <form onSubmit={handleSubmit} className="card card-padding mb-8">
+      <form onSubmit={handleSubmit} className="card card-padding mb-8" style={{display: isAdmin ? 'block' : 'none'}}>
         <div className="mb-4 pb-3 border-b">
           <h3 className="text-lg font-semibold text-gray-800">{editingId ? 'Editar Producto' : 'Nuevo Producto'}</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="form-label">Nombre del Producto</label>
-            <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Ej: Tuberías" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+            <input name="nombre" value={form.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Tuberías" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (errors.nombre ? 'border border-red-500' : 'border border-gray-300')} />
+            {errors.nombre && <p className="text-red-600 text-sm mt-1">{errors.nombre}</p>}
           </div>
           <div>
             <label className="form-label">Precio</label>
-            <input name="precio" value={form.precio} onChange={handleChange} placeholder="0.00" type="number" step="0.01" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            <input name="precio" value={form.precio} onChange={handleChange} onBlur={handleBlur} placeholder="0.00" type="number" step="0.01" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (errors.precio ? 'border border-red-500' : 'border border-gray-300')} />
+            {errors.precio && <p className="text-red-600 text-sm mt-1">{errors.precio}</p>}
           </div>
           <div>
             <label className="form-label">Categoría</label>
@@ -116,14 +159,16 @@ export default function Products(){
           </div>
           <div>
             <label className="form-label">Stock</label>
-            <input name="stock" value={form.stock} onChange={handleChange} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" />
+            <input name="stock" value={form.stock} onChange={handleChange} onBlur={handleBlur} placeholder="0" type="number" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (errors.stock ? 'border border-red-500' : 'border border-gray-300')} />
+            {errors.stock && <p className="text-red-600 text-sm mt-1">{errors.stock}</p>}
           </div>
           <div>
             <label className="form-label">Unidad de Medida <span className="text-red-500">*</span></label>
-            <select name="unidadMedida" value={form.unidadMedida} onChange={handleChange} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+            <select name="unidadMedida" value={form.unidadMedida} onChange={handleChange} onBlur={handleBlur} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (errors.unidadMedida ? 'border border-red-500' : 'border border-gray-300')}>
               <option value="">Seleccionar unidad</option>
               {UNIDADES_MEDIDA.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
+            {errors.unidadMedida && <p className="text-red-600 text-sm mt-1">{errors.unidadMedida}</p>}
           </div>
         </div>
         {formErrors && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formErrors}</div>}
@@ -151,8 +196,12 @@ export default function Products(){
                   </div>
                 </div>
                 <div className="mt-4 flex gap-2 justify-end">
-                  <Button variant="neutral" leftIcon={<FaEdit />} onClick={()=>startEdit(p)} className="px-3 py-1">Editar</Button>
-                  <Button variant="primary" leftIcon={<FaPowerOff />} onClick={()=>toggleEstado(p)} className="px-3 py-1">{p.estado === 'ACTIVO' ? 'Inactivar' : 'Activar'}</Button>
+                  {isAdmin && (
+                    <>
+                      <Button variant="neutral" leftIcon={<FaEdit />} onClick={()=>startEdit(p)} className="px-3 py-1">Editar</Button>
+                      <Button variant="primary" leftIcon={<FaPowerOff />} onClick={()=>toggleEstado(p)} className="px-3 py-1">{p.estado === 'ACTIVO' ? 'Inactivar' : 'Activar'}</Button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

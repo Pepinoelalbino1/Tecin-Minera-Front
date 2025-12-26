@@ -91,6 +91,32 @@ export async function getGuias(){
   return request('/api/guias')
 }
 
+// Conversiones (unidades)
+export async function getConversiones(productoId){
+  const q = productoId ? `?productoId=${productoId}` : ''
+  return request(`/api/unidades-conversion${q}`)
+}
+
+export async function createConversion(payload){
+  return request('/api/unidades-conversion', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+}
+
+export async function updateConversion(id, payload){
+  return request(`/api/unidades-conversion/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+}
+
+export async function deleteConversion(id){
+  return request(`/api/unidades-conversion/${id}`, { method: 'DELETE' })
+}
+
 // Products CRUD
 export async function getProduct(id){
   return request(`/api/productos/${id}`)

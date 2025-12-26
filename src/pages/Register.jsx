@@ -6,14 +6,53 @@ import { FaLock, FaUser, FaIdCard } from 'react-icons/fa'
 
 export default function Register(){
   const [form, setForm] = useState({ username: '', fullName: '', password: '' })
+  const [errors, setErrors] = useState({})
+  const [touched, setTouched] = useState({})
   const [loading, setLoading] = useState(false)
   const addToast = useToast()
   const navigate = useNavigate()
 
-  const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+    if (touched[name]) setErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+  }
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target
+    setTouched(prev => ({ ...prev, [name]: true }))
+    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+  }
+
+  const validateField = (name, value) => {
+    if (name === 'username') {
+      if (!value || value.trim() === '') return 'El usuario es requerido'
+      if (value.trim().length < 3) return 'El usuario debe tener al menos 3 caracteres'
+    }
+    if (name === 'fullName') {
+      if (value && value.trim().length > 0 && value.trim().length < 3) return 'El nombre completo debe tener al menos 3 caracteres'
+    }
+    if (name === 'password') {
+      if (!value || value.trim() === '') return 'La contraseña es requerida'
+      if (value.length < 6) return 'La contraseña debe tener al menos 6 caracteres'
+    }
+    return ''
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      username: validateField('username', form.username),
+      fullName: validateField('fullName', form.fullName),
+      password: validateField('password', form.password)
+    }
+    setErrors(newErrors)
+    setTouched({ username: true, fullName: true, password: true })
+    return !newErrors.username && !newErrors.password
+  }
 
   const handleSubmit = async (e) =>{
     e.preventDefault()
+    if (!validateForm()) return
     setLoading(true)
     try{
       await apiRegister(form)
@@ -61,10 +100,11 @@ export default function Register(){
                     name="username" 
                     value={form.username} 
                     onChange={handleChange} 
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
+                    onBlur={handleBlur}
+                    className={"w-full pl-10 pr-4 py-2.5 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition " + (errors.username ? 'border border-red-500' : 'border border-gray-300')}
                     placeholder="Tu nombre de usuario"
-                    required 
                   />
+                  {errors.username && <p className="text-red-600 text-sm mt-1">{errors.username}</p>}
                 </div>
               </div>
 
@@ -77,9 +117,11 @@ export default function Register(){
                     name="fullName" 
                     value={form.fullName} 
                     onChange={handleChange} 
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
+                    onBlur={handleBlur}
+                    className={"w-full pl-10 pr-4 py-2.5 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition " + (errors.fullName ? 'border border-red-500' : 'border border-gray-300')}
                     placeholder="Tu nombre completo"
                   />
+                  {errors.fullName && <p className="text-red-600 text-sm mt-1">{errors.fullName}</p>}
                 </div>
               </div>
 
@@ -92,11 +134,12 @@ export default function Register(){
                     name="password" 
                     value={form.password} 
                     onChange={handleChange} 
+                    onBlur={handleBlur}
                     type="password" 
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
+                    className={"w-full pl-10 pr-4 py-2.5 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition " + (errors.password ? 'border border-red-500' : 'border border-gray-300')}
                     placeholder="Crea una contraseña segura"
-                    required 
                   />
+                  {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
                 </div>
               </div>
 

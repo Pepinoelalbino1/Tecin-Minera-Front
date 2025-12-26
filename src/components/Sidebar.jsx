@@ -25,9 +25,11 @@ export default function Sidebar({ setIsAuthenticated }){
         <NavLink to="/productos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
           <FaBox className="w-4 h-4" /> <span>Productos</span>
         </NavLink>
-        <NavLink to="/categorias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
-          <FaFolder className="w-4 h-4" /> <span>Categorías</span>
-        </NavLink>
+        {user.role === 'ADMIN' && (
+          <NavLink to="/categorias" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
+            <FaFolder className="w-4 h-4" /> <span>Categorías</span>
+          </NavLink>
+        )}
         <NavLink to="/movimientos" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
           <FaExchangeAlt className="w-4 h-4" /> <span>Movimientos</span>
         </NavLink>
@@ -37,6 +39,11 @@ export default function Sidebar({ setIsAuthenticated }){
         <NavLink to="/reposicion" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
           <FaClipboardList className="w-4 h-4" /> <span>Reposición</span>
         </NavLink>
+        {user.role === 'ADMIN' && (
+          <NavLink to="/conversiones" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-primary text-white font-semibold shadow-sm' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
+            <FaFolder className="w-4 h-4" /> <span>Conversiones</span>
+          </NavLink>
+        )}
       </nav>
 
       {/* Toggle Tema */}

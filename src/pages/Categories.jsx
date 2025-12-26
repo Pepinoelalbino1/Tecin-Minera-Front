@@ -9,6 +9,7 @@ export default function Categories(){
   const [categories, setCategories] = useState([])
   const [name, setName] = useState('')
   const [descripcion, setDescripcion] = useState('')
+  const [nameError, setNameError] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
   const [editDescripcion, setEditDescripcion] = useState('')
@@ -30,6 +31,7 @@ export default function Categories(){
     setFormError(null)
     if(!name || name.trim().length < 2){
       setFormError('El nombre debe tener al menos 2 caracteres')
+      setNameError('El nombre debe tener al menos 2 caracteres')
       return
     }
     try{
@@ -97,7 +99,8 @@ export default function Categories(){
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="form-label">Nombre</label>
-            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Ej: Materiales" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+            <input value={name} onChange={e=>{ setName(e.target.value); if(nameError) setNameError('') }} onBlur={()=>{ if(!name || name.trim().length<2) setNameError('El nombre debe tener al menos 2 caracteres') }} placeholder="Ej: Materiales" className={"border p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (nameError ? 'border-red-500' : 'border-gray-300')} required />
+            {nameError && <p className="text-red-600 text-sm mt-1">{nameError}</p>}
           </div>
           <div>
             <label className="form-label">Descripción</label>

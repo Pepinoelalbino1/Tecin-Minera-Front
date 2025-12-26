@@ -19,6 +19,11 @@ export default function Movements(){
   const [startingStockDisplay, setStartingStockDisplay] = useState(null)
   const addToast = useToast()
 
+  const [entradaErrors, setEntradaErrors] = useState({})
+  const [salidaErrors, setSalidaErrors] = useState({})
+  const [entradaTouched, setEntradaTouched] = useState({})
+  const [salidaTouched, setSalidaTouched] = useState({})
+
   useEffect(()=>{
     setLoading(true)
     Promise.all([getProducts()])
@@ -31,10 +36,15 @@ export default function Movements(){
   const handleEntrada = async (e) =>{
     e.preventDefault()
     setError(null)
-    if(!entrada.productoId || !entrada.cantidad || !entrada.motivo){
-      setError('Todos los campos de entrada son obligatorios')
-      return
+    // validate
+    const newErr = {
+      productoId: !entrada.productoId ? 'Seleccione un producto' : '',
+      cantidad: !entrada.cantidad || Number(entrada.cantidad) <= 0 ? 'Ingrese una cantidad válida' : '',
+      motivo: !entrada.motivo ? 'Ingrese el motivo' : ''
     }
+    setEntradaErrors(newErr)
+    setEntradaTouched({ productoId: true, cantidad: true, motivo: true })
+    if (Object.values(newErr).some(v => v)) return
     try{
       await registrarEntrada({ productoId: Number(entrada.productoId), cantidad: Number(entrada.cantidad), motivo: entrada.motivo })
       setEntrada({ productoId: '', cantidad: '', motivo: '' })
@@ -46,10 +56,14 @@ export default function Movements(){
   const handleSalida = async (e) =>{
     e.preventDefault()
     setError(null)
-    if(!salida.productoId || !salida.cantidad || !salida.motivo){
-      setError('Todos los campos de salida son obligatorios')
-      return
+    const newErr = {
+      productoId: !salida.productoId ? 'Seleccione un producto' : '',
+      cantidad: !salida.cantidad || Number(salida.cantidad) <= 0 ? 'Ingrese una cantidad válida' : '',
+      motivo: !salida.motivo ? 'Ingrese el motivo' : ''
     }
+    setSalidaErrors(newErr)
+    setSalidaTouched({ productoId: true, cantidad: true, motivo: true })
+    if (Object.values(newErr).some(v => v)) return
     try{
       await registrarSalida({ productoId: Number(salida.productoId), cantidad: Number(salida.cantidad), motivo: salida.motivo })
       setSalida({ productoId: '', cantidad: '', motivo: '' })
@@ -140,18 +154,21 @@ export default function Movements(){
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="form-label">Producto</label>
-                    <select value={entrada.productoId} onChange={e=>setEntrada(prev=>({...prev, productoId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+                    <select value={entrada.productoId} onChange={e=>{ setEntrada(prev=>({...prev, productoId:e.target.value})); if(entradaTouched.productoId) setEntradaErrors(prev=>({...prev, productoId: e.target.value ? '' : 'Seleccione un producto'})) }} onBlur={()=>setEntradaTouched(prev=>({...prev, productoId:true}))} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (entradaErrors.productoId ? 'border border-red-500' : 'border border-gray-300')}>
                       <option value="">Seleccionar producto</option>
                       {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
                     </select>
+                    {entradaErrors.productoId && <p className="text-red-600 text-sm mt-1">{entradaErrors.productoId}</p>}
                   </div>
                   <div>
                     <label className="form-label">Cantidad</label>
-                    <input value={entrada.cantidad} onChange={e=>setEntrada(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                    <input value={entrada.cantidad} onChange={e=>{ setEntrada(prev=>({...prev, cantidad:e.target.value})); if(entradaTouched.cantidad) setEntradaErrors(prev=>({...prev, cantidad: (!e.target.value || Number(e.target.value) <= 0) ? 'Ingrese una cantidad válida' : '' })) }} onBlur={()=>setEntradaTouched(prev=>({...prev, cantidad:true}))} placeholder="0" type="number" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (entradaErrors.cantidad ? 'border border-red-500' : 'border border-gray-300')} />
+                    {entradaErrors.cantidad && <p className="text-red-600 text-sm mt-1">{entradaErrors.cantidad}</p>}
                   </div>
                   <div>
                     <label className="form-label">Motivo</label>
-                    <input value={entrada.motivo} onChange={e=>setEntrada(prev=>({...prev, motivo:e.target.value}))} placeholder="Compra, Devolución, etc." className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                    <input value={entrada.motivo} onChange={e=>{ setEntrada(prev=>({...prev, motivo:e.target.value})); if(entradaTouched.motivo) setEntradaErrors(prev=>({...prev, motivo: e.target.value ? '' : 'Ingrese el motivo' })) }} onBlur={()=>setEntradaTouched(prev=>({...prev, motivo:true}))} placeholder="Compra, Devolución, etc." className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (entradaErrors.motivo ? 'border border-red-500' : 'border border-gray-300')} />
+                    {entradaErrors.motivo && <p className="text-red-600 text-sm mt-1">{entradaErrors.motivo}</p>}
                   </div>
                 </div>
                 {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
@@ -164,18 +181,21 @@ export default function Movements(){
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="form-label">Producto</label>
-                    <select value={salida.productoId} onChange={e=>setSalida(prev=>({...prev, productoId:e.target.value}))} className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required>
+                    <select value={salida.productoId} onChange={e=>{ setSalida(prev=>({...prev, productoId:e.target.value})); if(salidaTouched.productoId) setSalidaErrors(prev=>({...prev, productoId: e.target.value ? '' : 'Seleccione un producto'})) }} onBlur={()=>setSalidaTouched(prev=>({...prev, productoId:true}))} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (salidaErrors.productoId ? 'border border-red-500' : 'border border-gray-300')}>
                       <option value="">Seleccionar producto</option>
                       {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
                     </select>
+                    {salidaErrors.productoId && <p className="text-red-600 text-sm mt-1">{salidaErrors.productoId}</p>}
                   </div>
                   <div>
                     <label className="form-label">Cantidad</label>
-                    <input value={salida.cantidad} onChange={e=>setSalida(prev=>({...prev, cantidad:e.target.value}))} placeholder="0" type="number" className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                    <input value={salida.cantidad} onChange={e=>{ setSalida(prev=>({...prev, cantidad:e.target.value})); if(salidaTouched.cantidad) setSalidaErrors(prev=>({...prev, cantidad: (!e.target.value || Number(e.target.value) <= 0) ? 'Ingrese una cantidad válida' : '' })) }} onBlur={()=>setSalidaTouched(prev=>({...prev, cantidad:true}))} placeholder="0" type="number" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (salidaErrors.cantidad ? 'border border-red-500' : 'border border-gray-300')} />
+                    {salidaErrors.cantidad && <p className="text-red-600 text-sm mt-1">{salidaErrors.cantidad}</p>}
                   </div>
                   <div>
                     <label className="form-label">Motivo</label>
-                    <input value={salida.motivo} onChange={e=>setSalida(prev=>({...prev, motivo:e.target.value}))} placeholder="Venta, Consumo, etc." className="border border-gray-300 p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20" required />
+                    <input value={salida.motivo} onChange={e=>{ setSalida(prev=>({...prev, motivo:e.target.value})); if(salidaTouched.motivo) setSalidaErrors(prev=>({...prev, motivo: e.target.value ? '' : 'Ingrese el motivo' })) }} onBlur={()=>setSalidaTouched(prev=>({...prev, motivo:true}))} placeholder="Venta, Consumo, etc." className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (salidaErrors.motivo ? 'border border-red-500' : 'border border-gray-300')} />
+                    {salidaErrors.motivo && <p className="text-red-600 text-sm mt-1">{salidaErrors.motivo}</p>}
                   </div>
                 </div>
                 {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
