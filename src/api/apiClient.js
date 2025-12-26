@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://tecinapp-production.up.railway.app'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://tecin-minera-production.up.railway.app'
 
 async function handleResponse(res){
   if(!res.ok){
