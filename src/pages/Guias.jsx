@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getGuias, createGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia, login } from '../api/apiClient'
+import { getGuias, createGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia } from '../api/apiClient'
 import Button from '../components/ui/Button'
 import { FaFilePdf, FaPaperPlane, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
@@ -223,26 +223,8 @@ export default function Guias(){
       window.open(guiaPdfUrl(id), '_blank')
       addToast('Guía emitida', 'success')
     }catch(err){
-      // Si es 401 y el usuario actual es ADMIN, intentar login silencioso y reintentar emitir
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      if(err?.status === 401 && user?.role === 'ADMIN' && user.username && user.password){
-        try{
-          await login({ username: user.username, password: user.password })
-          // reintentar una vez
-          await emitirGuia(id)
-          await load()
-          window.open(guiaPdfUrl(id), '_blank')
-          addToast('Guía emitida', 'success')
-          return
-        }catch(inner){
-          // si falla, mostrar mensaje final
-          setError(inner.message)
-          addToast(inner.message || 'Error al emitir guía después de relogin', 'error')
-          return
-        }
-      }
       setError(err.message);
-      addToast?.(err.message, 'error')
+      showApiError(addToast, err)
     }
   }
 
