@@ -159,7 +159,7 @@ export default function Login({ setIsAuthenticated }){
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-gray-100">
               <p className="text-center text-gray-500 text-xs">
-                Tecin Minera © 2024 - Sistema de Inventario y Guías de Remisión
+                Tecin Minera © 2025 - Sistema de Inventario y Guías de Remisión
               </p>
             </div>
           </div>
