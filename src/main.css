@@ -281,3 +281,11 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 .dark .text-xl.font-bold {
   color: #e2e8f0;
 }
+
+.dark .text-md.font-semibold {
+  color: #cbd5e1;
+}
+
+.dark .bg-gray-50 {
+  background-color: #334155;
+}

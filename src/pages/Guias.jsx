@@ -252,8 +252,8 @@ export default function Guias(){
       )}
 
       <form onSubmit={handleCreate} className="card card-padding mb-8">
-        <div className="mb-4 pb-3 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">Nueva Guía de Remisión</h3>
+        <div className="mb-4 pb-3 border-b border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">Nueva Guía de Remisión</h3>
         </div>
         
         {/* Serie y Fechas */}
@@ -427,8 +427,8 @@ export default function Guias(){
       </form>
 
       <form onSubmit={handleAddDetalle} className="card card-padding mb-8">
-        <div className="mb-4 pb-3 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">Añadir Productos a Guía</h3>
+        <div className="mb-4 pb-3 border-b border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">Añadir Productos a Guía</h3>
         </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
@@ -478,7 +478,7 @@ export default function Guias(){
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="font-bold text-lg text-gray-900">
+                    <div className="font-bold text-lg text-gray-900 dark:text-slate-100">
                       {g.serie && g.numeroGuia ? `${g.serie}-${g.numeroGuia}` : g.numeroGuia || `Guía #${g.id}`}
                     </div>
                     <span className={`badge ${g.estado === 'EMITIDA' ? 'badge-success' : 'badge-inactive'}`}>
@@ -486,24 +486,24 @@ export default function Guias(){
                     </span>
                   </div>
                   <div className="space-y-1 text-sm">
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 dark:text-slate-300">
                       <span className="font-medium mr-2">Emisor:</span>
                       <span>{g.emisorRazonSocial || '-'} (RUC: {g.emisorRuc || '-'})</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 dark:text-slate-300">
                       <span className="font-medium mr-2">Destinatario:</span>
                       <span>{g.destinatarioRazonSocial || '-'} ({g.destinatarioRucDni || '-'})</span>
                     </div>
-                    <div className="flex items-center text-gray-700">
+                    <div className="flex items-center text-gray-700 dark:text-slate-300">
                       <span className="font-medium mr-2">Ruta:</span>
                       <span>{g.puntoPartida || '-'} → {g.puntoLlegada || '-'}</span>
                     </div>
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-slate-400">
                       <span className="font-medium mr-2">Motivo:</span>
                       <span>{MOTIVOS_TRASLADO.find(m => m.value === g.motivoTraslado)?.label || g.motivoTraslado || '-'}</span>
                     </div>
                     {g.tipoTransporte && (
-                      <div className="flex items-center text-gray-600">
+                      <div className="flex items-center text-gray-600 dark:text-slate-400">
                         <span className="font-medium mr-2">Transporte:</span>
                         <span>{g.tipoTransporte === 'PRIVADO' ? `Privado - Placa: ${g.placaVehiculo || '-'}` : `Público - ${g.transportistaRazonSocial || '-'}`}</span>
                       </div>
@@ -516,13 +516,13 @@ export default function Guias(){
                 </div>
               </div>
               {g.detalles && g.detalles.length>0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <div className="text-sm font-semibold text-gray-700 mb-3">Productos</div>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">Productos</div>
                   <ul className="space-y-2">
                     {g.detalles.map(d=> (
-                      <li key={d.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <li key={d.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-slate-700 rounded">
                         <div className="flex items-center gap-3">
-                          <span className="font-medium text-gray-900">{d.descripcionBien || d.productoNombre || d.productoId}</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{d.descripcionBien || d.productoNombre || d.productoId}</span>
                           <span className="badge badge-primary">{d.cantidad} {d.unidadMedida || 'UND'}</span>
                         </div>
                         {g.estado !== 'EMITIDA' && (
