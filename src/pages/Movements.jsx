@@ -24,20 +24,32 @@ export default function Movements(){
   const [entradaTouched, setEntradaTouched] = useState({})
   const [salidaTouched, setSalidaTouched] = useState({})
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-'
+  const formatDate = (dateValue) => {
+    if (!dateValue) return '-'
     try {
-      // Si viene en formato ISO (2025-12-27T02:07:07.01526), tomar solo la parte de la fecha
-      const datePart = dateString.split('T')[0]
-      const date = new Date(datePart)
-      if (isNaN(date.getTime())) return dateString
-      // Formatear como DD/MM/YYYY
-      const day = String(date.getDate()).padStart(2, '0')
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const year = date.getFullYear()
-      return `${day}/${month}/${year}`
+      // El backend ahora envía la fecha en formato yyyy-MM-dd (sin hora)
+      // Si viene con hora (formato ISO), extraer solo la parte de la fecha
+      let dateStr = typeof dateValue === 'string' ? dateValue.split('T')[0] : String(dateValue)
+      
+      // Verificar si tiene formato yyyy-MM-dd
+      const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/)
+      if (match) {
+        const [, year, month, day] = match
+        return `${day}/${month}/${year}`
+      }
+      
+      // Si no coincide, intentar parsear como Date
+      const date = new Date(dateStr)
+      if (!isNaN(date.getTime())) {
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+      }
+      
+      return dateValue
     } catch (e) {
-      return dateString
+      return dateValue
     }
   }
 
