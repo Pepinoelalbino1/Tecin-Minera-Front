@@ -289,3 +289,11 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 .dark .bg-gray-50 {
   background-color: #334155;
 }
+
+.dark .border-gray-200 {
+  border-color: #475569;
+}
+
+.dark .border-t {
+  border-color: #475569;
+}
