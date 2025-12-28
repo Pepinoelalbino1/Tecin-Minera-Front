@@ -138,19 +138,19 @@ export default function Conversiones(){
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">Producto</th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">Unidad</th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">Factor</th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">Acciones</th>
+                <tr className="border-b dark:border-slate-600">
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Producto</th>
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Unidad</th>
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Factor</th>
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {lista.map(item => (
-                  <tr key={item.id} className="border-t hover:bg-gray-50 dark:hover:bg-slate-700">
-                    <td className="py-3 px-2">{item.producto?.nombre || '-'}</td>
-                    <td className="py-3 px-2">{item.unidad}</td>
-                    <td className="py-3 px-2">{item.factorToBase}</td>
+                  <tr key={item.id} className="border-t dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
+                    <td className="py-3 px-2 dark:text-slate-200">{item.producto?.nombre || '-'}</td>
+                    <td className="py-3 px-2 dark:text-slate-200">{item.unidad}</td>
+                    <td className="py-3 px-2 dark:text-slate-200">{item.factorToBase}</td>
                     <td className="py-3 px-2 flex gap-2">
                       <Button variant="primary" className="px-3 py-1.5 text-sm" leftIcon={<FaEdit />} onClick={()=>onEdit(item)}>Editar</Button>
                       <Button variant="danger" className="px-3 py-1.5 text-sm" leftIcon={<FaTrash />} onClick={()=>onDelete(item.id)}>Eliminar</Button>

@@ -95,20 +95,20 @@ export default function Reposicion(){
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-y border-gray-200">
-                    <th className="py-2 px-3 text-left font-semibold text-gray-700">Sel</th>
-                    <th className="py-2 px-3 text-left font-semibold text-gray-700">Nombre</th>
-                    <th className="py-2 px-3 text-left font-semibold text-gray-700">Categoría</th>
-                    <th className="py-2 px-3 text-right font-semibold text-gray-700">Stock</th>
+                  <tr className="bg-gray-50 dark:bg-slate-700 border-y border-gray-200 dark:border-slate-600">
+                    <th className="py-2 px-3 text-left font-semibold text-gray-700 dark:text-slate-200">Sel</th>
+                    <th className="py-2 px-3 text-left font-semibold text-gray-700 dark:text-slate-200">Nombre</th>
+                    <th className="py-2 px-3 text-left font-semibold text-gray-700 dark:text-slate-200">Categoría</th>
+                    <th className="py-2 px-3 text-right font-semibold text-gray-700 dark:text-slate-200">Stock</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.filter(p => Number(p.stock) === 0).map(p => (
-                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={p.id} className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
                       <td className="py-2 px-3"><input type="checkbox" checked={reponerSelected.includes(p.id)} onChange={()=>toggleReponer(p.id)} aria-label={`Seleccionar ${p.nombre}`} /></td>
-                      <td className="py-2 px-3">{p.nombre}</td>
-                      <td className="py-2 px-3">{p.categoriaNombre || p.categoriaId || '-'}</td>
-                      <td className="py-2 px-3 text-right">{p.stock}</td>
+                      <td className="py-2 px-3 dark:text-slate-200">{p.nombre}</td>
+                      <td className="py-2 px-3 dark:text-slate-300">{p.categoriaNombre || p.categoriaId || '-'}</td>
+                      <td className="py-2 px-3 text-right dark:text-slate-200">{p.stock}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -238,28 +238,28 @@ export default function Movements(){
                 <div className="overflow-x-auto">
                   <table id="kardexTable" className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50 border-y border-gray-200">
-                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Fecha</th>
-                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Tipo</th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700">Cantidad</th>
-                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Motivo</th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700">Saldo</th>
+                      <tr className="bg-gray-50 dark:bg-slate-700 border-y border-gray-200 dark:border-slate-600">
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700 dark:text-slate-200">Fecha</th>
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700 dark:text-slate-200">Tipo</th>
+                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-slate-200">Cantidad</th>
+                        <th className="py-3 px-4 text-left font-semibold text-gray-700 dark:text-slate-200">Motivo</th>
+                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-slate-200">Saldo</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kardex.length === 0 ? (
-                        <tr><td colSpan={5} className="py-12 text-center text-gray-500">No hay movimientos para este producto.</td></tr>
+                        <tr><td colSpan={5} className="py-12 text-center text-gray-500 dark:text-slate-400">No hay movimientos para este producto.</td></tr>
                       ) : (
                         kardex.map((row, idx) => (
-                          <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4">{row.fecha || row.createdAt || '-'}</td>
+                          <tr key={idx} className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
+                            <td className="py-3 px-4 dark:text-slate-200">{row.fecha || row.createdAt || '-'}</td>
                             <td className="py-3 px-4">
                               <span className={`badge ${(row.tipo || row.tipoMovimiento || '').toUpperCase() === 'ENTRADA' ? 'badge-success' : 'badge-primary'}`}>
                                 {row.tipo || row.tipoMovimiento || '-'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right font-medium">{row.cantidad || 0}</td>
-                            <td className="py-3 px-4 text-gray-600">{row.motivo || '-'}</td>
+                            <td className="py-3 px-4 text-right font-medium dark:text-slate-200">{row.cantidad || 0}</td>
+                            <td className="py-3 px-4 text-gray-600 dark:text-slate-300">{row.motivo || '-'}</td>
                             <td className="py-3 px-4 text-right font-bold text-primary">{row.saldo !== undefined ? row.saldo : '-'}</td>
                           </tr>
                         ))
