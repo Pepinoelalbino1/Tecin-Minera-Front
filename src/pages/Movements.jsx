@@ -24,6 +24,23 @@ export default function Movements(){
   const [entradaTouched, setEntradaTouched] = useState({})
   const [salidaTouched, setSalidaTouched] = useState({})
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '-'
+    try {
+      // Si viene en formato ISO (2025-12-27T02:07:07.01526), tomar solo la parte de la fecha
+      const datePart = dateString.split('T')[0]
+      const date = new Date(datePart)
+      if (isNaN(date.getTime())) return dateString
+      // Formatear como DD/MM/YYYY
+      const day = String(date.getDate()).padStart(2, '0')
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const year = date.getFullYear()
+      return `${day}/${month}/${year}`
+    } catch (e) {
+      return dateString
+    }
+  }
+
   useEffect(()=>{
     setLoading(true)
     Promise.all([getProducts()])
@@ -252,7 +269,7 @@ export default function Movements(){
                       ) : (
                         kardex.map((row, idx) => (
                           <tr key={idx} className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
-                            <td className="py-3 px-4 dark:text-slate-200">{row.fecha || row.createdAt || '-'}</td>
+                            <td className="py-3 px-4 dark:text-slate-200">{formatDate(row.fecha || row.createdAt)}</td>
                             <td className="py-3 px-4">
                               <span className={`badge ${(row.tipo || row.tipoMovimiento || '').toUpperCase() === 'ENTRADA' ? 'badge-success' : 'badge-primary'}`}>
                                 {row.tipo || row.tipoMovimiento || '-'}
