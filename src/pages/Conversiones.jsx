@@ -147,7 +147,7 @@ export default function Conversiones(){
               </thead>
               <tbody>
                 {lista.map(item => (
-                  <tr key={item.id} className="border-t hover:bg-gray-50">
+                  <tr key={item.id} className="border-t hover:bg-gray-50 dark:hover:bg-slate-700">
                     <td className="py-3 px-2">{item.producto?.nombre || '-'}</td>
                     <td className="py-3 px-2">{item.unidad}</td>
                     <td className="py-3 px-2">{item.factorToBase}</td>
