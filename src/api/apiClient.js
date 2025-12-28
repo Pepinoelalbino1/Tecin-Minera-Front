@@ -191,6 +191,14 @@ export async function createGuia(payload){
   })
 }
 
+export async function updateGuia(id, payload){
+  return request(`/api/guias/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+}
+
 export async function addDetalleGuia(id, payload){
   return request(`/api/guias/${id}/detalle`, {
     method: 'POST',

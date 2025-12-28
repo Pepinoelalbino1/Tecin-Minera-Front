@@ -1,6 +1,11 @@
 export function formatApiError(err){
   if(!err) return 'Error desconocido'
-  if(typeof err === 'string') return err
+  if(typeof err === 'string') {
+    // Extraer solo el mensaje si viene con prefijo "Network error fetching..."
+    const networkErrorMatch = err.match(/^Network error fetching [^:]+: (.+)$/)
+    if(networkErrorMatch) return networkErrorMatch[1]
+    return err
+  }
   if(err.api){
     const api = err.api
     if(api.message) return api.message
@@ -15,6 +20,11 @@ export function formatApiError(err){
       return `${maybeJson.status ? maybeJson.status + ' — ' : ''}${maybeJson.error ? maybeJson.error + ': ' : ''}${maybeJson.message || maybeJson.error}`
     }
   }catch(e){ /* ignore */ }
+  // Extraer solo el mensaje si viene con prefijo "Network error fetching..."
+  if(err.message){
+    const networkErrorMatch = err.message.match(/^Network error fetching [^:]+: (.+)$/)
+    if(networkErrorMatch) return networkErrorMatch[1]
+  }
   return err.message || String(err)
 }
 

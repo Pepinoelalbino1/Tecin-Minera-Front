@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getGuias, createGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia } from '../api/apiClient'
+import { getGuias, createGuia, updateGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia } from '../api/apiClient'
 import Button from '../components/ui/Button'
 import { FaFilePdf, FaPaperPlane, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
@@ -51,6 +51,7 @@ export default function Guias(){
   const [detalle, setDetalle] = useState({ guiaId: '', productoId: '', cantidad: '', descripcionBien: '', unidadMedida: 'UND' })
   const [detalleErrors, setDetalleErrors] = useState({})
   const [selectedGuiaId, setSelectedGuiaId] = useState('')
+  const [editingGuiaId, setEditingGuiaId] = useState(null)
 
   const addToast = useToast()
   const onlyDigits = (v) => (v || '').toString().replace(/\D/g, '')
@@ -84,6 +85,62 @@ export default function Guias(){
 
   useEffect(()=>{ load() }, [])
 
+  const resetForm = () => {
+    setForm({
+      serie: 'GR',
+      fechaEmision: '',
+      fechaInicioTraslado: '',
+      emisorRuc: '',
+      emisorRazonSocial: '',
+      emisorDireccionFiscal: '',
+      destinatarioRucDni: '',
+      destinatarioRazonSocial: '',
+      destinatarioDireccion: '',
+      puntoPartida: '',
+      puntoLlegada: '',
+      motivoTraslado: '',
+      tipoTransporte: 'PRIVADO',
+      placaVehiculo: '',
+      conductorNombre: '',
+      conductorDni: '',
+      transportistaRazonSocial: '',
+      transportistaRuc: '',
+      observaciones: '',
+      referenciaComprobante: '',
+      pesoTotal: ''
+    })
+    setEditingGuiaId(null)
+    setErrors({})
+    setTouched({})
+  }
+
+  const loadGuiaToForm = (guia) => {
+    setForm({
+      serie: guia.serie || 'GR',
+      fechaEmision: guia.fechaEmision || '',
+      fechaInicioTraslado: guia.fechaInicioTraslado || '',
+      emisorRuc: guia.emisorRuc || '',
+      emisorRazonSocial: guia.emisorRazonSocial || '',
+      emisorDireccionFiscal: guia.emisorDireccionFiscal || '',
+      destinatarioRucDni: guia.destinatarioRucDni || '',
+      destinatarioRazonSocial: guia.destinatarioRazonSocial || '',
+      destinatarioDireccion: guia.destinatarioDireccion || '',
+      puntoPartida: guia.puntoPartida || '',
+      puntoLlegada: guia.puntoLlegada || '',
+      motivoTraslado: guia.motivoTraslado || '',
+      tipoTransporte: guia.tipoTransporte || 'PRIVADO',
+      placaVehiculo: guia.placaVehiculo || '',
+      conductorNombre: guia.conductorNombre || '',
+      conductorDni: guia.conductorDni || '',
+      transportistaRazonSocial: guia.transportistaRazonSocial || '',
+      transportistaRuc: guia.transportistaRuc || '',
+      observaciones: guia.observaciones || '',
+      referenciaComprobante: guia.referenciaComprobante || '',
+      pesoTotal: guia.pesoTotal ? String(guia.pesoTotal) : ''
+    })
+    setEditingGuiaId(guia.id)
+  }
+
   const handleCreate = async (e) =>{
     e.preventDefault()
     setError(null)
@@ -94,32 +151,17 @@ export default function Guias(){
     try{
       const payload = { ...form }
       if(form.pesoTotal) payload.pesoTotal = parseFloat(form.pesoTotal)
-      await createGuia(payload)
-      setForm({
-        serie: 'GR',
-        fechaEmision: '',
-        fechaInicioTraslado: '',
-        emisorRuc: '',
-        emisorRazonSocial: '',
-        emisorDireccionFiscal: '',
-        destinatarioRucDni: '',
-        destinatarioRazonSocial: '',
-        destinatarioDireccion: '',
-        puntoPartida: '',
-        puntoLlegada: '',
-        motivoTraslado: '',
-        tipoTransporte: 'PRIVADO',
-        placaVehiculo: '',
-        conductorNombre: '',
-        conductorDni: '',
-        transportistaRazonSocial: '',
-        transportistaRuc: '',
-        observaciones: '',
-        referenciaComprobante: '',
-        pesoTotal: ''
-      })
+      
+      if(editingGuiaId) {
+        await updateGuia(editingGuiaId, payload)
+        addToast('Guía actualizada', 'success')
+      } else {
+        await createGuia(payload)
+        addToast('Guía creada', 'success')
+      }
+      
+      resetForm()
       await load()
-      addToast('Guía creada', 'success')
     }catch(err){ setError(err.message); showApiError(addToast, err) }
   }
 
@@ -252,8 +294,13 @@ export default function Guias(){
       )}
 
       <form onSubmit={handleCreate} className="card card-padding mb-8">
-        <div className="mb-4 pb-3 border-b border-gray-200 dark:border-slate-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">Nueva Guía de Remisión</h3>
+        <div className="mb-4 pb-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">
+            {editingGuiaId ? 'Editar Guía de Remisión' : 'Nueva Guía de Remisión'}
+          </h3>
+          {editingGuiaId && (
+            <Button variant="neutral" onClick={resetForm} className="text-sm">Cancelar</Button>
+          )}
         </div>
         
         {/* Serie y Fechas */}
@@ -422,7 +469,9 @@ export default function Guias(){
 
         {error && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
         <div className="mt-5 pt-4 border-t flex justify-end">
-          <Button variant="primary" leftIcon={<FaPlus />}>Crear Guía</Button>
+          <Button variant="primary" leftIcon={<FaPlus />}>
+            {editingGuiaId ? 'Actualizar Guía' : 'Crear Guía'}
+          </Button>
         </div>
       </form>
 
@@ -474,7 +523,17 @@ export default function Guias(){
       ) : (
         <div className="space-y-5">
           {guias.map(g => (
-            <div key={g.id} className="card card-padding">
+            <div 
+              key={g.id} 
+              className={`card card-padding ${g.estado === 'BORRADOR' || !g.estado ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors' : ''}`}
+              onClick={() => {
+                if(g.estado === 'BORRADOR' || !g.estado) {
+                  loadGuiaToForm(g)
+                  // Scroll al formulario
+                  document.querySelector('form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }}
+            >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -510,7 +569,7 @@ export default function Guias(){
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
                   <a href={guiaPdfUrl(g.id)} target="_blank" rel="noreferrer"><Button variant="neutral" leftIcon={<FaFilePdf />} className="px-3 py-1.5 text-sm">PDF</Button></a>
                   {g.estado !== 'EMITIDA' && <Button variant="primary" leftIcon={<FaPaperPlane />} onClick={()=>handleEmitir(g.id)} className="px-3 py-1.5 text-sm">Emitir</Button>}
                 </div>
@@ -526,7 +585,8 @@ export default function Guias(){
                           <span className="badge badge-primary">{d.cantidad} {d.unidadMedida || 'UND'}</span>
                         </div>
                         {g.estado !== 'EMITIDA' && (
-                          <Button variant="danger" className="px-2 py-1 text-xs" onClick={async ()=>{
+                          <Button variant="danger" className="px-2 py-1 text-xs" onClick={async (e)=>{
+                            e.stopPropagation()
                             if(!confirm('¿Eliminar este detalle?')) return
                             try{
                               await deleteDetalleGuia(g.id, d.id)
