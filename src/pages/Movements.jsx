@@ -250,15 +250,15 @@ export default function Movements(){
             </div>
             {selectedKardexProductId ? (
               <div>
-                <div className="mb-5 flex gap-6 items-center p-4 bg-gray-50 rounded-lg">
+                <div className="mb-5 flex gap-6 items-center p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
                   <div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Saldo Actual</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-1">Saldo Actual</div>
                     <div className="text-2xl font-bold text-primary">{currentStockDisplay ?? '-'}</div>
                   </div>
-                  <div className="h-10 w-px bg-gray-300"></div>
+                  <div className="h-10 w-px bg-gray-300 dark:bg-slate-600"></div>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Saldo Inicial</div>
-                    <div className="text-2xl font-bold text-gray-700">{startingStockDisplay ?? '-'}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-1">Saldo Inicial</div>
+                    <div className="text-2xl font-bold text-gray-700 dark:text-slate-200">{startingStockDisplay ?? '-'}</div>
                   </div>
                   <div className="ml-auto">
                     <Button variant="neutral" leftIcon={<FaPrint />} onClick={handlePrintKardex} className="px-3 py-1.5 text-sm" aria-label="Imprimir kardex" title="Imprimir kardex">Imprimir</Button>

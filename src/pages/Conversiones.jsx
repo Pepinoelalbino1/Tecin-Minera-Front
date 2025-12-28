@@ -138,7 +138,7 @@ export default function Conversiones(){
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b dark:border-slate-600">
+                <tr className="bg-gray-50 dark:bg-slate-700 border-b dark:border-slate-600">
                   <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Producto</th>
                   <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Unidad</th>
                   <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-slate-200">Factor</th>

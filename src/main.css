@@ -297,3 +297,53 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 .dark .border-t {
   border-color: #475569;
 }
+
+/* Estilos específicos para tablas en modo oscuro */
+.dark table {
+  color: #e2e8f0;
+}
+
+.dark table tbody tr {
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+/* Hover para filas de tabla en modo oscuro - mayor especificidad */
+.dark table tbody tr:hover,
+.dark table tbody tr[class*="hover:bg-gray-50"]:hover,
+.dark table tbody tr[class*="dark:hover:bg-slate-700"]:hover {
+  background-color: #334155 !important;
+}
+
+.dark table thead tr,
+.dark table thead tr[class*="bg-gray-50"] {
+  background-color: #1e293b !important;
+}
+
+/* Corregir bg-gray-50 en modo oscuro para elementos no tabulares */
+.dark .bg-gray-50:not(thead):not(tbody tr) {
+  background-color: #334155;
+}
+
+.dark .bg-gray-300 {
+  background-color: #475569;
+}
+
+.dark .bg-gray-100 {
+  background-color: #334155;
+}
+
+/* Asegurar que los bordes de las tablas sean visibles en modo oscuro */
+.dark table tbody tr.border-b,
+.dark table tbody tr[class*="border-b"] {
+  border-bottom-color: #475569 !important;
+}
+
+.dark table tbody tr.border-t,
+.dark table tbody tr[class*="border-t"] {
+  border-top-color: #475569 !important;
+}
+
+.dark table thead tr[class*="border"] {
+  border-color: #475569 !important;
+}
