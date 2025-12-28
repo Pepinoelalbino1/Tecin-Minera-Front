@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getProducts, getConversiones, createConversion, updateConversion, deleteConversion } from '../api/apiClient'
 import Button from '../components/ui/Button'
+import ProductSearch from '../components/ui/ProductSearch'
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
@@ -96,11 +97,15 @@ export default function Conversiones(){
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="form-label">Producto</label>
-            <select name="productoId" value={form.productoId} onChange={onChange} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (errors.productoId ? 'border border-red-500' : 'border border-gray-300')}>
-              <option value="">-- seleccionar --</option>
-              {productos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
-            {errors.productoId && <span className="text-red-500 text-xs mt-1">{errors.productoId}</span>}
+            <ProductSearch
+              productos={productos}
+              value={form.productoId}
+              onChange={onChange}
+              error={errors.productoId}
+              placeholder="Buscar producto..."
+              showStock={true}
+              showCategory={true}
+            />
           </div>
 
           <div>

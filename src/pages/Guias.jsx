@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getGuias, createGuia, updateGuia, addDetalleGuia, emitirGuia, guiaPdfUrl, getProducts, deleteDetalleGuia } from '../api/apiClient'
 import Button from '../components/ui/Button'
+import ProductSearch from '../components/ui/ProductSearch'
 import { FaFilePdf, FaPaperPlane, FaPlus } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
@@ -490,11 +491,19 @@ export default function Guias(){
           </div>
           <div>
             <label className="form-label">Producto</label>
-            <select value={detalle.productoId} onChange={e=>{ handleProductoChange(e.target.value); setDetalleErrors(prev=>({...prev, productoId: e.target.value ? '' : 'Seleccione un producto'})) }} onBlur={handleDetalleBlur} name="productoId" className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (detalleErrors.productoId ? 'border border-red-500' : 'border border-gray-300') }>
-              <option value="">Seleccionar producto</option>
-              {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
-            {detalleErrors.productoId && <p className="text-red-600 text-sm mt-1">{detalleErrors.productoId}</p>}
+            <ProductSearch
+              productos={productos}
+              value={detalle.productoId}
+              onChange={(e) => {
+                handleProductoChange(e.target.value)
+                setDetalleErrors(prev => ({ ...prev, productoId: e.target.value ? '' : 'Seleccione un producto' }))
+              }}
+              onBlur={handleDetalleBlur}
+              error={detalleErrors.productoId}
+              placeholder="Buscar producto..."
+              showStock={true}
+              showCategory={true}
+            />
           </div>
           <div>
             <label className="form-label">Cantidad <span className="text-red-500">*</span></label>

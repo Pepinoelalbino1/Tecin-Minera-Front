@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { registrarEntrada, registrarSalida, getKardex, getProducts, getProduct } from '../api/apiClient'
 import Button from '../components/ui/Button'
+import ProductSearch from '../components/ui/ProductSearch'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
 import { FaArrowDown, FaArrowUp, FaPlus, FaPrint } from 'react-icons/fa'
@@ -183,11 +184,19 @@ export default function Movements(){
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="form-label">Producto</label>
-                    <select value={entrada.productoId} onChange={e=>{ setEntrada(prev=>({...prev, productoId:e.target.value})); if(entradaTouched.productoId) setEntradaErrors(prev=>({...prev, productoId: e.target.value ? '' : 'Seleccione un producto'})) }} onBlur={()=>setEntradaTouched(prev=>({...prev, productoId:true}))} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (entradaErrors.productoId ? 'border border-red-500' : 'border border-gray-300')}>
-                      <option value="">Seleccionar producto</option>
-                      {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                    </select>
-                    {entradaErrors.productoId && <p className="text-red-600 text-sm mt-1">{entradaErrors.productoId}</p>}
+                    <ProductSearch
+                      productos={productos}
+                      value={entrada.productoId}
+                      onChange={(e) => {
+                        setEntrada(prev => ({ ...prev, productoId: e.target.value }))
+                        if(entradaTouched.productoId) setEntradaErrors(prev => ({ ...prev, productoId: e.target.value ? '' : 'Seleccione un producto' }))
+                      }}
+                      onBlur={() => setEntradaTouched(prev => ({ ...prev, productoId: true }))}
+                      error={entradaErrors.productoId}
+                      placeholder="Buscar producto..."
+                      showStock={true}
+                      showCategory={true}
+                    />
                   </div>
                   <div>
                     <label className="form-label">Cantidad</label>
@@ -210,11 +219,19 @@ export default function Movements(){
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="form-label">Producto</label>
-                    <select value={salida.productoId} onChange={e=>{ setSalida(prev=>({...prev, productoId:e.target.value})); if(salidaTouched.productoId) setSalidaErrors(prev=>({...prev, productoId: e.target.value ? '' : 'Seleccione un producto'})) }} onBlur={()=>setSalidaTouched(prev=>({...prev, productoId:true}))} className={"p-2.5 rounded-lg w-full focus:ring-2 focus:ring-primary/20 " + (salidaErrors.productoId ? 'border border-red-500' : 'border border-gray-300')}>
-                      <option value="">Seleccionar producto</option>
-                      {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                    </select>
-                    {salidaErrors.productoId && <p className="text-red-600 text-sm mt-1">{salidaErrors.productoId}</p>}
+                    <ProductSearch
+                      productos={productos}
+                      value={salida.productoId}
+                      onChange={(e) => {
+                        setSalida(prev => ({ ...prev, productoId: e.target.value }))
+                        if(salidaTouched.productoId) setSalidaErrors(prev => ({ ...prev, productoId: e.target.value ? '' : 'Seleccione un producto' }))
+                      }}
+                      onBlur={() => setSalidaTouched(prev => ({ ...prev, productoId: true }))}
+                      error={salidaErrors.productoId}
+                      placeholder="Buscar producto..."
+                      showStock={true}
+                      showCategory={true}
+                    />
                   </div>
                   <div>
                     <label className="form-label">Cantidad</label>
@@ -243,10 +260,19 @@ export default function Movements(){
           <div>
             <div className="mb-6">
               <label className="form-label">Seleccionar Producto</label>
-              <select className="border border-gray-300 p-2.5 rounded-lg w-full md:w-1/2 focus:ring-2 focus:ring-primary/20" value={selectedKardexProductId} onChange={e => { setSelectedKardexProductId(e.target.value); loadKardex(e.target.value) }}>
-                <option value="">Seleccione un producto</option>
-                {productos.map(p=> <option key={p.id} value={p.id}>{p.nombre}</option>)}
-              </select>
+              <div className="w-full md:w-1/2">
+                <ProductSearch
+                  productos={productos}
+                  value={selectedKardexProductId}
+                  onChange={(e) => {
+                    setSelectedKardexProductId(e.target.value)
+                    loadKardex(e.target.value)
+                  }}
+                  placeholder="Buscar producto para ver kardex..."
+                  showStock={true}
+                  showCategory={true}
+                />
+              </div>
             </div>
             {selectedKardexProductId ? (
               <div>
