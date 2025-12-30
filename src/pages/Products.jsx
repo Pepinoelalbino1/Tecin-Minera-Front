@@ -12,7 +12,7 @@ import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
 
 // Unidades de medida base estandarizadas para los productos
-const UNIDADES_MEDIDA = ['UND', 'KG', 'M3', 'L', 'GR']
+const UNIDADES_MEDIDA = ['UND', 'KG', 'L', 'M3', 'GR', 'BOLSA']
 
 export default function Products(){
   const [products, setProducts] = useState([])
