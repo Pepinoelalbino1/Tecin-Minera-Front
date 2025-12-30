@@ -11,8 +11,8 @@ import { FaEdit, FaPowerOff } from 'react-icons/fa'
 import { useToast } from '../components/ToastContext'
 import { showApiError } from '../utils/errorHelpers'
 
-// Unidades de medida estandarizadas (mismas que en Guias.jsx)
-const UNIDADES_MEDIDA = ['UND', 'KG', 'CAJA', 'BOLSA', 'BIDON', 'PALLET', 'M3', 'L', 'GR', 'OTROS']
+// Unidades de medida base estandarizadas para los productos
+const UNIDADES_MEDIDA = ['UND', 'KG', 'M3', 'L', 'GR']
 
 export default function Products(){
   const [products, setProducts] = useState([])
